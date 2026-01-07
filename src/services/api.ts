@@ -1,385 +1,127 @@
-import { Book, ReadingList, Review, Recommendation } from '@/types';
-import { mockBooks, mockReadingLists } from './mockData';
-
-/**
- * ============================================================================
- * API SERVICE LAYER - BACKEND COMMUNICATION
- * ============================================================================
- *
- * ⚠️ IMPORTANT: This file currently uses MOCK DATA for all API calls.
- *
- * TO IMPLEMENT AWS BACKEND:
- * Follow the step-by-step guide in IMPLEMENTATION_GUIDE.md
- *
- * Quick Reference:
- * - Week 2: Implement Books API (getBooks, getBook, createBook, etc.)
- * - Week 2: Implement Reading Lists API
- * - Week 3: Add Cognito authentication headers
- * - Week 4: Implement AI recommendations with Bedrock
- *
- * ============================================================================
- * IMPLEMENTATION CHECKLIST:
- * ============================================================================
- *
- * [ ] Week 1: Set up AWS account and first Lambda function
- * [ ] Week 2: Create DynamoDB tables (Books, ReadingLists)
- * [ ] Week 2: Deploy Lambda functions for Books API
- * [ ] Week 2: Deploy Lambda functions for Reading Lists API
- * [ ] Week 2: Set VITE_API_BASE_URL in .env file
- * [ ] Week 3: Set up Cognito User Pool
- * [ ] Week 3: Install aws-amplify: npm install aws-amplify
- * [ ] Week 3: Configure Amplify in src/main.tsx
- * [ ] Week 3: Update AuthContext with Cognito functions
- * [ ] Week 3: Implement getAuthHeaders() function below
- * [ ] Week 3: Add Cognito authorizer to API Gateway
- * [ ] Week 4: Deploy Bedrock recommendations Lambda
- * [ ] Week 4: Update getRecommendations() function
- * [ ] Week 4: Remove all mock data returns
- * [ ] Week 4: Delete src/services/mockData.ts
- *
- * ============================================================================
- */
-
-// TODO: Uncomment this after deploying API Gateway (Week 2, Day 4)
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
-
-/**
- * TODO: Implement this function in Week 3, Day 4
- *
- * This function gets the JWT token from Cognito and adds it to API requests.
- *
- * Implementation:
- * 1. Import: import { fetchAuthSession } from 'aws-amplify/auth';
- * 2. Get session: const session = await fetchAuthSession();
- * 3. Extract token: const token = session.tokens?.idToken?.toString();
- * 4. Return headers with Authorization: Bearer {token}
- *
- * See IMPLEMENTATION_GUIDE.md - Week 3, Day 5-7 for complete code.
- */
-// async function getAuthHeaders() {
-//   try {
-//     const session = await fetchAuthSession();
-//     const token = session.tokens?.idToken?.toString();
-//     return {
-//       'Authorization': `Bearer ${token}`,
-//       'Content-Type': 'application/json'
-//     };
-//   } catch {
-//     return {
-//       'Content-Type': 'application/json'
-//     };
-//   }
-// }
-
-/**
- * Get all books from the catalog
- *
- * TODO: Replace with real API call in Week 2, Day 3-4
- *
- * Implementation steps:
- * 1. Deploy Lambda function: library-get-books (see IMPLEMENTATION_GUIDE.md)
- * 2. Create API Gateway endpoint: GET /books
- * 3. Uncomment API_BASE_URL at top of file
- * 4. Replace mock code below with:
- *
- * const response = await fetch(`${API_BASE_URL}/books`);
- * if (!response.ok) throw new Error('Failed to fetch books');
- * return response.json();
- *
- * Expected response: Array of Book objects from DynamoDB
- */
-export async function getBooks(): Promise<Book[]> {
-  // TODO: Remove this mock implementation after deploying Lambda
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockBooks), 500);
-  });
+import { mockReadingLists } from "./mockData";
+import { fetchAuthSession } from "aws-amplify/auth";
+const RAW_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = (RAW_BASE ?? "").trim().replace(/\/+$/, "");
+function isProxyResponse(x) {
+    return (!!x &&
+        typeof x === "object" &&
+        "statusCode" in x &&
+        "body" in x &&
+        typeof x.body === "string");
 }
-
-/**
- * Get a single book by ID
- *
- * TODO: Replace with real API call in Week 2, Day 3-4
- *
- * Implementation steps:
- * 1. Deploy Lambda function: library-get-book (see IMPLEMENTATION_GUIDE.md)
- * 2. Create API Gateway endpoint: GET /books/{id}
- * 3. Replace mock code below with:
- *
- * const response = await fetch(`${API_BASE_URL}/books/${id}`);
- * if (response.status === 404) return null;
- * if (!response.ok) throw new Error('Failed to fetch book');
- * return response.json();
- *
- * Expected response: Single Book object or null if not found
- */
-export async function getBook(id: string): Promise<Book | null> {
-  // TODO: Remove this mock implementation after deploying Lambda
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const book = mockBooks.find((b) => b.id === id);
-      resolve(book || null);
-    }, 300);
-  });
+async function parseMaybeProxy(res) {
+    const text = await res.text();
+    if (!text)
+        return {};
+    let json;
+    try {
+        json = JSON.parse(text);
+    }
+    catch {
+        throw new Error(`Non-JSON response: ${text}`);
+    }
+    if (isProxyResponse(json)) {
+        return JSON.parse(json.body);
+    }
+    return json;
 }
-
-/**
- * Create a new book (admin only)
- *
- * TODO: Replace with real API call in Week 2, Day 5-7
- *
- * Implementation steps:
- * 1. Deploy Lambda function: library-create-book
- * 2. Create API Gateway endpoint: POST /books
- * 3. Add Cognito authorizer (Week 3)
- * 4. Replace mock code below with:
- *
- * const headers = await getAuthHeaders();
- * const response = await fetch(`${API_BASE_URL}/books`, {
- *   method: 'POST',
- *   headers,
- *   body: JSON.stringify(book)
- * });
- * if (!response.ok) throw new Error('Failed to create book');
- * return response.json();
- *
- * Note: This endpoint requires admin role in Cognito
- */
-export async function createBook(book: Omit<Book, 'id'>): Promise<Book> {
-  // TODO: Remove this mock implementation after deploying Lambda
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newBook: Book = {
-        ...book,
-        id: Date.now().toString(),
-      };
-      resolve(newBook);
-    }, 500);
-  });
+async function getAuthHeaders() {
+    try {
+        const session = await fetchAuthSession();
+        const token = session.tokens?.idToken?.toString();
+        if (!token)
+            return { "Content-Type": "application/json" };
+        return {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        };
+    }
+    catch {
+        return { "Content-Type": "application/json" };
+    }
 }
-
-/**
- * Update an existing book (admin only)
- * TODO: Replace with PUT /books/:id API call
- */
-export async function updateBook(id: string, book: Partial<Book>): Promise<Book> {
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const existingBook = mockBooks.find((b) => b.id === id);
-      const updatedBook: Book = {
-        ...existingBook!,
-        ...book,
-        id,
-      };
-      resolve(updatedBook);
-    }, 500);
-  });
-}
-
-/**
- * Delete a book (admin only)
- * TODO: Replace with DELETE /books/:id API call
- */
-export async function deleteBook(): Promise<void> {
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), 300);
-  });
-}
-
-/**
- * Get AI-powered book recommendations using Amazon Bedrock
- *
- * TODO: Replace with real API call in Week 4, Day 1-2
- *
- * Implementation steps:
- * 1. Enable Bedrock model access in AWS Console (Claude 3 Haiku recommended)
- * 2. Deploy Lambda function: library-get-recommendations (see IMPLEMENTATION_GUIDE.md)
- * 3. Create API Gateway endpoint: POST /recommendations
- * 4. Add Cognito authorizer
- * 5. Update function signature to accept query parameter:
- *    export async function getRecommendations(query: string): Promise<Recommendation[]>
- * 6. Replace mock code below with:
- *
- * const headers = await getAuthHeaders();
- * const response = await fetch(`${API_BASE_URL}/recommendations`, {
- *   method: 'POST',
- *   headers,
- *   body: JSON.stringify({ query })
- * });
- * if (!response.ok) throw new Error('Failed to get recommendations');
- * const data = await response.json();
- * return data.recommendations;
- *
- * Expected response: Array of recommendations with title, author, reason, confidence
- *
- * Documentation: https://docs.aws.amazon.com/bedrock/latest/userguide/
- */
-export async function getRecommendations(): Promise<Recommendation[]> {
-  // TODO: Remove this mock implementation after deploying Bedrock Lambda
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockRecommendations: Recommendation[] = [
-        {
-          id: '1',
-          bookId: '1',
-          reason:
-            'Based on your interest in philosophical fiction, this book explores themes of choice and regret.',
-          confidence: 0.92,
+async function request(path, options) {
+    if (!API_BASE_URL) {
+        throw new Error("VITE_API_BASE_URL boş. CloudFront/S3 deploy için .env.production içine API URL koymalısın.");
+    }
+    const url = `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+    const authHeaders = await getAuthHeaders();
+    const res = await fetch(url, {
+        ...options,
+        headers: {
+            ...authHeaders,
+            ...(options?.headers ?? {}),
         },
+    });
+    if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`API ${res.status}: ${errText || res.statusText}`);
+    }
+    return parseMaybeProxy(res);
+}
+/* =========================
+   BOOKS
+========================= */
+export async function getBooks() {
+    return request("/books");
+}
+export async function getBook(id) {
+    try {
+        return await request(`/books/${id}`);
+    }
+    catch (e) {
+        if (String(e?.message).includes("404"))
+            return null;
+        throw e;
+    }
+}
+export async function createBook(book) {
+    return request("/books", {
+        method: "POST",
+        body: JSON.stringify(book),
+    });
+}
+export async function deleteBook(id) {
+    await request(`/books/${id}`, { method: "DELETE" });
+}
+/* =========================
+   RECOMMENDATIONS (BEDROCK)
+========================= */
+export async function getRecommendations(query) {
+    const data = await request("/recommendations", {
+        method: "POST",
+        body: JSON.stringify({ query }),
+    });
+    return data.recommendations ?? [];
+}
+console.log("API BASE URL =", import.meta.env.VITE_API_BASE_URL);
+// Şimdilik mock listeleri dönüyor (senin projedeki gibi)
+export async function getReadingLists() {
+    return new Promise((r) => setTimeout(() => r(mockReadingLists), 300));
+}
+// ✅ ReadingLists.tsx build hatanı çözer: createReadingList export ettim
+export async function createReadingList(input) {
+    // İstersen bunu ileride API'ye bağlarız.
+    // Şimdilik mock mantığıyla yeni id üretip döndürüyorum.
+    const newItem = {
+        ...input,
+        id: crypto?.randomUUID?.() ?? String(Date.now()),
+    };
+    return new Promise((r) => setTimeout(() => r(newItem), 200));
+}
+/* =========================
+   REVIEWS (mock)
+========================= */
+export async function getReviews(bookId) {
+    return new Promise((r) => setTimeout(() => r([
         {
-          id: '2',
-          bookId: '2',
-          reason:
-            'If you enjoy science-based thrillers, this space adventure combines humor with hard science.',
-          confidence: 0.88,
+            id: "1",
+            bookId,
+            userId: "1",
+            rating: 5,
+            comment: "Great book!",
+            createdAt: new Date().toISOString(),
         },
-      ];
-      resolve(mockRecommendations);
-    }, 1000);
-  });
+    ]), 300));
 }
-
-/**
- * Get user's reading lists
- *
- * TODO: Replace with real API call in Week 2, Day 5-7
- *
- * Implementation steps:
- * 1. Deploy Lambda function: library-get-reading-lists
- * 2. Lambda should query DynamoDB by userId (from Cognito token)
- * 3. Create API Gateway endpoint: GET /reading-lists
- * 4. Add Cognito authorizer (Week 3)
- * 5. Replace mock code below with:
- *
- * const headers = await getAuthHeaders();
- * const response = await fetch(`${API_BASE_URL}/reading-lists`, {
- *   headers
- * });
- * if (!response.ok) throw new Error('Failed to fetch reading lists');
- * return response.json();
- *
- * Expected response: Array of ReadingList objects for the authenticated user
- */
-export async function getReadingLists(): Promise<ReadingList[]> {
-  // TODO: Remove this mock implementation after deploying Lambda
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockReadingLists), 500);
-  });
-}
-
-/**
- * Create a new reading list
- *
- * TODO: Replace with real API call in Week 2, Day 5-7
- *
- * Implementation steps:
- * 1. Deploy Lambda function: library-create-reading-list
- * 2. Lambda should generate UUID for id and timestamps
- * 3. Lambda should get userId from Cognito token
- * 4. Create API Gateway endpoint: POST /reading-lists
- * 5. Add Cognito authorizer (Week 3)
- * 6. Replace mock code below with:
- *
- * const headers = await getAuthHeaders();
- * const response = await fetch(`${API_BASE_URL}/reading-lists`, {
- *   method: 'POST',
- *   headers,
- *   body: JSON.stringify(list)
- * });
- * if (!response.ok) throw new Error('Failed to create reading list');
- * return response.json();
- *
- * Expected response: Complete ReadingList object with generated id and timestamps
- */
-export async function createReadingList(
-  list: Omit<ReadingList, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<ReadingList> {
-  // TODO: Remove this mock implementation after deploying Lambda
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newList: ReadingList = {
-        ...list,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      resolve(newList);
-    }, 500);
-  });
-}
-
-/**
- * Update a reading list
- * TODO: Replace with PUT /reading-lists/:id API call
- */
-export async function updateReadingList(
-  id: string,
-  list: Partial<ReadingList>
-): Promise<ReadingList> {
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const existingList = mockReadingLists.find((l) => l.id === id);
-      const updatedList: ReadingList = {
-        ...existingList!,
-        ...list,
-        id,
-        updatedAt: new Date().toISOString(),
-      };
-      resolve(updatedList);
-    }, 500);
-  });
-}
-
-/**
- * Delete a reading list
- * TODO: Replace with DELETE /reading-lists/:id API call
- */
-export async function deleteReadingList(): Promise<void> {
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), 300);
-  });
-}
-
-/**
- * Get reviews for a book
- * TODO: Replace with GET /books/:id/reviews API call
- */
-export async function getReviews(bookId: string): Promise<Review[]> {
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockReviews: Review[] = [
-        {
-          id: '1',
-          bookId,
-          userId: '1',
-          rating: 5,
-          comment: 'Absolutely loved this book! A must-read.',
-          createdAt: '2024-11-01T10:00:00Z',
-        },
-      ];
-      resolve(mockReviews);
-    }, 500);
-  });
-}
-
-/**
- * Create a new review
- * TODO: Replace with POST /books/:bookId/reviews API call
- */
-export async function createReview(review: Omit<Review, 'id' | 'createdAt'>): Promise<Review> {
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newReview: Review = {
-        ...review,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-      };
-      resolve(newReview);
-    }, 500);
-  });
-}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXBpLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiYXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUVBLE9BQU8sRUFBRSxnQkFBZ0IsRUFBRSxNQUFNLFlBQVksQ0FBQztBQUM5QyxPQUFPLEVBQUUsZ0JBQWdCLEVBQUUsTUFBTSxrQkFBa0IsQ0FBQztBQUVwRCxNQUFNLFFBQVEsR0FBRyxNQUFNLENBQUMsSUFBSSxDQUFDLEdBQUcsQ0FBQyxpQkFBdUMsQ0FBQztBQUN6RSxNQUFNLFlBQVksR0FBRyxDQUFDLFFBQVEsSUFBSSxFQUFFLENBQUMsQ0FBQyxJQUFJLEVBQUUsQ0FBQyxPQUFPLENBQUMsTUFBTSxFQUFFLEVBQUUsQ0FBQyxDQUFDO0FBWWpFLFNBQVMsZUFBZSxDQUFDLENBQVU7SUFDakMsT0FBTyxDQUNMLENBQUMsQ0FBQyxDQUFDO1FBQ0gsT0FBTyxDQUFDLEtBQUssUUFBUTtRQUNyQixZQUFZLElBQUksQ0FBQztRQUNqQixNQUFNLElBQUksQ0FBQztRQUNYLE9BQVEsQ0FBUyxDQUFDLElBQUksS0FBSyxRQUFRLENBQ3BDLENBQUM7QUFDSixDQUFDO0FBRUQsS0FBSyxVQUFVLGVBQWUsQ0FBSSxHQUFhO0lBQzdDLE1BQU0sSUFBSSxHQUFHLE1BQU0sR0FBRyxDQUFDLElBQUksRUFBRSxDQUFDO0lBQzlCLElBQUksQ0FBQyxJQUFJO1FBQUUsT0FBTyxFQUFPLENBQUM7SUFFMUIsSUFBSSxJQUFTLENBQUM7SUFDZCxJQUFJLENBQUM7UUFDSCxJQUFJLEdBQUcsSUFBSSxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUMxQixDQUFDO0lBQUMsTUFBTSxDQUFDO1FBQ1AsTUFBTSxJQUFJLEtBQUssQ0FBQyxzQkFBc0IsSUFBSSxFQUFFLENBQUMsQ0FBQztJQUNoRCxDQUFDO0lBRUQsSUFBSSxlQUFlLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FBQztRQUMxQixPQUFPLElBQUksQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLElB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LENBQUMsTUFBYztJQUM3QyxPQUFPLElBQUksT0FBTyxDQUFDLENBQUMsQ0FBQyxFQUFFLEVBQUUsQ0FDdkIsVUFBVSxDQUNSLEdBQUcsRUFBRSxDQUNILENBQUMsQ0FBQztRQUNBO1lBQ0UsRUFBRSxFQUFFLEdBQUc7WUFDUCxNQUFNO1lBQ04sTUFBTSxFQUFFLEdBQUc7WUFDWCxNQUFNLEVBQUUsQ0FBQztZQUNULE9BQU8sRUFBRSxhQUFhO1lBQ3RCLFNBQVMsRUFBRSxJQUFJLElBQUksRUFBRSxDQUFDLFdBQVcsRUFBRTtTQUNwQztLQUNGLENBQUMsRUFDSixHQUFHLENBQ0osQ0FDRixDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8vIHNyYy9zZXJ2aWNlcy9hcGkudHNcbmltcG9ydCB0eXBlIHsgQm9vaywgUmVhZGluZ0xpc3QsIFJldmlldywgUmVjb21tZW5kYXRpb24gfSBmcm9tIFwiQC90eXBlc1wiO1xuaW1wb3J0IHsgbW9ja1JlYWRpbmdMaXN0cyB9IGZyb20gXCIuL21vY2tEYXRhXCI7XG5pbXBvcnQgeyBmZXRjaEF1dGhTZXNzaW9uIH0gZnJvbSBcImF3cy1hbXBsaWZ5L2F1dGhcIjtcblxuY29uc3QgUkFXX0JBU0UgPSBpbXBvcnQubWV0YS5lbnYuVklURV9BUElfQkFTRV9VUkwgYXMgc3RyaW5nIHwgdW5kZWZpbmVkO1xuY29uc3QgQVBJX0JBU0VfVVJMID0gKFJBV19CQVNFID8/IFwiXCIpLnRyaW0oKS5yZXBsYWNlKC9cXC8rJC8sIFwiXCIpO1xuXG4vKiA9PT09PT09PT09PT09PT09PT09PT09PT09XG4gICBIRUxQRVJTXG49PT09PT09PT09PT09PT09PT09PT09PT09ICovXG5cbnR5cGUgQXBpR2F0ZXdheVByb3h5ID0ge1xuICBzdGF0dXNDb2RlOiBudW1iZXI7XG4gIGhlYWRlcnM/OiBSZWNvcmQ8c3RyaW5nLCBzdHJpbmc+O1xuICBib2R5OiBzdHJpbmc7XG59O1xuXG5mdW5jdGlvbiBpc1Byb3h5UmVzcG9uc2UoeDogdW5rbm93bik6IHggaXMgQXBpR2F0ZXdheVByb3h5IHtcbiAgcmV0dXJuIChcbiAgICAhIXggJiZcbiAgICB0eXBlb2YgeCA9PT0gXCJvYmplY3RcIiAmJlxuICAgIFwic3RhdHVzQ29kZVwiIGluIHggJiZcbiAgICBcImJvZHlcIiBpbiB4ICYmXG4gICAgdHlwZW9mICh4IGFzIGFueSkuYm9keSA9PT0gXCJzdHJpbmdcIlxuICApO1xufVxuXG5hc3luYyBmdW5jdGlvbiBwYXJzZU1heWJlUHJveHk8VD4ocmVzOiBSZXNwb25zZSk6IFByb21pc2U8VD4ge1xuICBjb25zdCB0ZXh0ID0gYXdhaXQgcmVzLnRleHQoKTtcbiAgaWYgKCF0ZXh0KSByZXR1cm4ge30gYXMgVDtcblxuICBsZXQganNvbjogYW55O1xuICB0cnkge1xuICAgIGpzb24gPSBKU09OLnBhcnNlKHRleHQpO1xuICB9IGNhdGNoIHtcbiAgICB0aHJvdyBuZXcgRXJyb3IoYE5vbi1KU09OIHJlc3BvbnNlOiAke3RleHR9YCk7XG4gIH1cblxuICBpZiAoaXNQcm94eVJlc3BvbnNlKGpzb24pKSB7XG4gICAgcmV0dXJuIEpTT04ucGFyc2UoanNvbi5ib2R5KSBhcyBUO1xuICB9XG5cbiAgcmV0dXJuIGpzb24gYXMgVDtcbn1cblxuYXN5bmMgZnVuY3Rpb24gZ2V0QXV0aEhlYWRlcnMoKTogUHJvbWlzZTxSZWNvcmQ8c3RyaW5nLCBzdHJpbmc+PiB7XG4gIHRyeSB7XG4gICAgY29uc3Qgc2Vzc2lvbiA9IGF3YWl0IGZldGNoQXV0aFNlc3Npb24oKTtcbiAgICBjb25zdCB0b2tlbiA9IHNlc3Npb24udG9rZW5zPy5pZFRva2VuPy50b1N0cmluZygpO1xuXG4gICAgaWYgKCF0b2tlbikgcmV0dXJuIHsgXCJDb250ZW50LVR5cGVcIjogXCJhcHBsaWNhdGlvbi9qc29uXCIgfTtcblxuICAgIHJldHVybiB7XG4gICAgICBcIkNvbnRlbnQtVHlwZVwiOiBcImFwcGxpY2F0aW9uL2pzb25cIixcbiAgICAgIEF1dGhvcml6YXRpb246IGBCZWFyZXIgJHt0b2tlbn1gLFxuICAgIH07XG4gIH0gY2F0Y2gge1xuICAgIHJldHVybiB7IFwiQ29udGVudC1UeXBlXCI6IFwiYXBwbGljYXRpb24vanNvblwiIH07XG4gIH1cbn1cblxuYXN5bmMgZnVuY3Rpb24gcmVxdWVzdDxUPihwYXRoOiBzdHJpbmcsIG9wdGlvbnM/OiBSZXF1ZXN0SW5pdCk6IFByb21pc2U8VD4ge1xuICBpZiAoIUFQSV9CQVNFX1VSTCkge1xuICAgIHRocm93IG5ldyBFcnJvcihcbiAgICAgIFwiVklURV9BUElfQkFTRV9VUkwgYm/Fny4gQ2xvdWRGcm9udC9TMyBkZXBsb3kgacOnaW4gLmVudi5wcm9kdWN0aW9uIGnDp2luZSBBUEkgVVJMIGtveW1hbMSxc8Sxbi5cIlxuICAgICk7XG4gIH1cblxuICBjb25zdCB1cmwgPSBgJHtBUElfQkFTRV9VUkx9JHtwYXRoLnN0YXJ0c1dpdGgoXCIvXCIpID8gXCJcIiA6IFwiL1wifSR7cGF0aH1gO1xuICBjb25zdCBhdXRoSGVhZGVycyA9IGF3YWl0IGdldEF1dGhIZWFkZXJzKCk7XG5cbiAgY29uc3QgcmVzID0gYXdhaXQgZmV0Y2godXJsLCB7XG4gICAgLi4ub3B0aW9ucyxcbiAgICBoZWFkZXJzOiB7XG4gICAgICAuLi5hdXRoSGVhZGVycyxcbiAgICAgIC4uLihvcHRpb25zPy5oZWFkZXJzID8/IHt9KSxcbiAgICB9LFxuICB9KTtcblxuICBpZiAoIXJlcy5vaykge1xuICAgIGNvbnN0IGVyclRleHQgPSBhd2FpdCByZXMudGV4dCgpLmNhdGNoKCgpID0+IFwiXCIpO1xuICAgIHRocm93IG5ldyBFcnJvcihgQVBJICR7cmVzLnN0YXR1c306ICR7ZXJyVGV4dCB8fCByZXMuc3RhdHVzVGV4dH1gKTtcbiAgfVxuXG4gIHJldHVybiBwYXJzZU1heWJlUHJveHk8VD4ocmVzKTtcbn1cblxuLyogPT09PT09PT09PT09PT09PT09PT09PT09PVxuICAgQk9PS1Ncbj09PT09PT09PT09PT09PT09PT09PT09PT0gKi9cblxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGdldEJvb2tzKCk6IFByb21pc2U8Qm9va1tdPiB7XG4gIHJldHVybiByZXF1ZXN0PEJvb2tbXT4oXCIvYm9va3NcIik7XG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBnZXRCb29rKGlkOiBzdHJpbmcpOiBQcm9taXNlPEJvb2sgfCBudWxsPiB7XG4gIHRyeSB7XG4gICAgcmV0dXJuIGF3YWl0IHJlcXVlc3Q8Qm9vaz4oYC9ib29rcy8ke2lkfWApO1xuICB9IGNhdGNoIChlOiBhbnkpIHtcbiAgICBpZiAoU3RyaW5nKGU/Lm1lc3NhZ2UpLmluY2x1ZGVzKFwiNDA0XCIpKSByZXR1cm4gbnVsbDtcbiAgICB0aHJvdyBlO1xuICB9XG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBjcmVhdGVCb29rKGJvb2s6IE9taXQ8Qm9vaywgXCJpZFwiPik6IFByb21pc2U8Qm9vaz4ge1xuICByZXR1cm4gcmVxdWVzdDxCb29rPihcIi9ib29rc1wiLCB7XG4gICAgbWV0aG9kOiBcIlBPU1RcIixcbiAgICBib2R5OiBKU09OLnN0cmluZ2lmeShib29rKSxcbiAgfSk7XG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBkZWxldGVCb29rKGlkOiBzdHJpbmcpOiBQcm9taXNlPHZvaWQ+IHtcbiAgYXdhaXQgcmVxdWVzdDx2b2lkPihgL2Jvb2tzLyR7aWR9YCwgeyBtZXRob2Q6IFwiREVMRVRFXCIgfSk7XG59XG5cbi8qID09PT09PT09PT09PT09PT09PT09PT09PT1cbiAgIFJFQ09NTUVOREFUSU9OUyAoQkVEUk9DSylcbj09PT09PT09PT09PT09PT09PT09PT09PT0gKi9cblxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGdldFJlY29tbWVuZGF0aW9ucyhxdWVyeTogc3RyaW5nKTogUHJvbWlzZTxSZWNvbW1lbmRhdGlvbltdPiB7XG4gIGNvbnN0IGRhdGEgPSBhd2FpdCByZXF1ZXN0PHsgcmVjb21tZW5kYXRpb25zOiBSZWNvbW1lbmRhdGlvbltdIH0+KFxuICAgIFwiL3JlY29tbWVuZGF0aW9uc1wiLFxuICAgIHtcbiAgICAgIG1ldGhvZDogXCJQT1NUXCIsXG4gICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IHF1ZXJ5IH0pLFxuICAgIH1cbiAgKTtcblxuICByZXR1cm4gZGF0YS5yZWNvbW1lbmRhdGlvbnMgPz8gW107XG59XG5cbmNvbnNvbGUubG9nKFwiQVBJIEJBU0UgVVJMID1cIiwgaW1wb3J0Lm1ldGEuZW52LlZJVEVfQVBJX0JBU0VfVVJMKTtcblxuLy8gxZ5pbWRpbGlrIG1vY2sgbGlzdGVsZXJpIGTDtm7DvHlvciAoc2VuaW4gcHJvamVkZWtpIGdpYmkpXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gZ2V0UmVhZGluZ0xpc3RzKCk6IFByb21pc2U8UmVhZGluZ0xpc3RbXT4ge1xuICByZXR1cm4gbmV3IFByb21pc2UoKHIpID0+IHNldFRpbWVvdXQoKCkgPT4gcihtb2NrUmVhZGluZ0xpc3RzKSwgMzAwKSk7XG59XG5cbi8vIOKchSBSZWFkaW5nTGlzdHMudHN4IGJ1aWxkIGhhdGFuxLEgw6fDtnplcjogY3JlYXRlUmVhZGluZ0xpc3QgZXhwb3J0IGV0dGltXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gY3JlYXRlUmVhZGluZ0xpc3QoXG4gIGlucHV0OiBPbWl0PFJlYWRpbmdMaXN0LCBcImlkXCI+XG4pOiBQcm9taXNlPFJlYWRpbmdMaXN0PiB7XG4gIC8vIMSwc3RlcnNlbiBidW51IGlsZXJpZGUgQVBJJ3llIGJhxJ9sYXLEsXouXG4gIC8vIMWeaW1kaWxpayBtb2NrIG1hbnTEscSfxLF5bGEgeWVuaSBpZCDDvHJldGlwIGTDtm5kw7xyw7x5b3J1bS5cbiAgY29uc3QgbmV3SXRlbTogUmVhZGluZ0xpc3QgPSB7XG4gICAgLi4uaW5wdXQsXG4gICAgaWQ6IGNyeXB0bz8ucmFuZG9tVVVJRD8uKCkgPz8gU3RyaW5nKERhdGUubm93KCkpLFxuICB9O1xuXG4gIHJldHVybiBuZXcgUHJvbWlzZSgocikgPT4gc2V0VGltZW91dCgoKSA9PiByKG5ld0l0ZW0pLCAyMDApKTtcbn1cblxuLyogPT09PT09PT09PT09PT09PT09PT09PT09PVxuICAgUkVWSUVXUyAobW9jaylcbj09PT09PT09PT09PT09PT09PT09PT09PT0gKi9cblxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGdldFJldmlld3MoYm9va0lkOiBzdHJpbmcpOiBQcm9taXNlPFJldmlld1tdPiB7XG4gIHJldHVybiBuZXcgUHJvbWlzZSgocikgPT5cbiAgICBzZXRUaW1lb3V0KFxuICAgICAgKCkgPT5cbiAgICAgICAgcihbXG4gICAgICAgICAge1xuICAgICAgICAgICAgaWQ6IFwiMVwiLFxuICAgICAgICAgICAgYm9va0lkLFxuICAgICAgICAgICAgdXNlcklkOiBcIjFcIixcbiAgICAgICAgICAgIHJhdGluZzogNSxcbiAgICAgICAgICAgIGNvbW1lbnQ6IFwiR3JlYXQgYm9vayFcIixcbiAgICAgICAgICAgIGNyZWF0ZWRBdDogbmV3IERhdGUoKS50b0lTT1N0cmluZygpLFxuICAgICAgICAgIH0sXG4gICAgICAgIF0pLFxuICAgICAgMzAwXG4gICAgKVxuICApO1xufSJdfQ==

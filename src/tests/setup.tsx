@@ -1,0 +1,8 @@
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom';
+// Cleanup after each test
+afterEach(() => {
+    cleanup();
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2V0dXAuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJzZXR1cC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQUUsU0FBUyxFQUFFLE1BQU0sUUFBUSxDQUFDO0FBQ25DLE9BQU8sRUFBRSxPQUFPLEVBQUUsTUFBTSx3QkFBd0IsQ0FBQztBQUNqRCxPQUFPLDJCQUEyQixDQUFDO0FBRW5DLDBCQUEwQjtBQUMxQixTQUFTLENBQUMsR0FBRyxFQUFFO0lBQ2IsT0FBTyxFQUFFLENBQUM7QUFDWixDQUFDLENBQUMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGFmdGVyRWFjaCB9IGZyb20gJ3ZpdGVzdCc7XG5pbXBvcnQgeyBjbGVhbnVwIH0gZnJvbSAnQHRlc3RpbmctbGlicmFyeS9yZWFjdCc7XG5pbXBvcnQgJ0B0ZXN0aW5nLWxpYnJhcnkvamVzdC1kb20nO1xuXG4vLyBDbGVhbnVwIGFmdGVyIGVhY2ggdGVzdFxuYWZ0ZXJFYWNoKCgpID0+IHtcbiAgY2xlYW51cCgpO1xufSk7XG4iXX0=

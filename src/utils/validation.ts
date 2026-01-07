@@ -1,37 +1,35 @@
 /**
  * Validation utility functions
  */
-
 /**
  * Validates an email address format
  * @param email - Email address to validate
  * @returns True if email is valid, false otherwise
  */
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+export function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
-
 /**
  * Validates password strength
  * @param password - Password to validate
  * @returns True if password meets requirements (min 8 chars, 1 uppercase, 1 lowercase, 1 number)
  */
-export function validatePassword(password: string): boolean {
-  if (password.length < 8) {
-    return false;
-  }
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  return hasUpperCase && hasLowerCase && hasNumber;
+export function validatePassword(password) {
+    if (password.length < 8) {
+        return false;
+    }
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    return hasUpperCase && hasLowerCase && hasNumber;
 }
-
 /**
  * Validates that a field is not empty
  * @param value - Value to validate
  * @returns True if value is not empty, false otherwise
  */
-export function validateRequired(value: string): boolean {
-  return value.trim().length > 0;
+export function validateRequired(value) {
+    return value.trim().length > 0;
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidmFsaWRhdGlvbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbInZhbGlkYXRpb24udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7O0dBRUc7QUFFSDs7OztHQUlHO0FBQ0gsTUFBTSxVQUFVLGFBQWEsQ0FBQyxLQUFhO0lBQ3pDLE1BQU0sVUFBVSxHQUFHLDRCQUE0QixDQUFDO0lBQ2hELE9BQU8sVUFBVSxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUMsQ0FBQztBQUNoQyxDQUFDO0FBRUQ7Ozs7R0FJRztBQUNILE1BQU0sVUFBVSxnQkFBZ0IsQ0FBQyxRQUFnQjtJQUMvQyxJQUFJLFFBQVEsQ0FBQyxNQUFNLEdBQUcsQ0FBQyxFQUFFLENBQUM7UUFDeEIsT0FBTyxLQUFLLENBQUM7SUFDZixDQUFDO0lBQ0QsTUFBTSxZQUFZLEdBQUcsT0FBTyxDQUFDLElBQUksQ0FBQyxRQUFRLENBQUMsQ0FBQztJQUM1QyxNQUFNLFlBQVksR0FBRyxPQUFPLENBQUMsSUFBSSxDQUFDLFFBQVEsQ0FBQyxDQUFDO0lBQzVDLE1BQU0sU0FBUyxHQUFHLE9BQU8sQ0FBQyxJQUFJLENBQUMsUUFBUSxDQUFDLENBQUM7SUFDekMsT0FBTyxZQUFZLElBQUksWUFBWSxJQUFJLFNBQVMsQ0FBQztBQUNuRCxDQUFDO0FBRUQ7Ozs7R0FJRztBQUNILE1BQU0sVUFBVSxnQkFBZ0IsQ0FBQyxLQUFhO0lBQzVDLE9BQU8sS0FBSyxDQUFDLElBQUksRUFBRSxDQUFDLE1BQU0sR0FBRyxDQUFDLENBQUM7QUFDakMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogVmFsaWRhdGlvbiB1dGlsaXR5IGZ1bmN0aW9uc1xuICovXG5cbi8qKlxuICogVmFsaWRhdGVzIGFuIGVtYWlsIGFkZHJlc3MgZm9ybWF0XG4gKiBAcGFyYW0gZW1haWwgLSBFbWFpbCBhZGRyZXNzIHRvIHZhbGlkYXRlXG4gKiBAcmV0dXJucyBUcnVlIGlmIGVtYWlsIGlzIHZhbGlkLCBmYWxzZSBvdGhlcndpc2VcbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIHZhbGlkYXRlRW1haWwoZW1haWw6IHN0cmluZyk6IGJvb2xlYW4ge1xuICBjb25zdCBlbWFpbFJlZ2V4ID0gL15bXlxcc0BdK0BbXlxcc0BdK1xcLlteXFxzQF0rJC87XG4gIHJldHVybiBlbWFpbFJlZ2V4LnRlc3QoZW1haWwpO1xufVxuXG4vKipcbiAqIFZhbGlkYXRlcyBwYXNzd29yZCBzdHJlbmd0aFxuICogQHBhcmFtIHBhc3N3b3JkIC0gUGFzc3dvcmQgdG8gdmFsaWRhdGVcbiAqIEByZXR1cm5zIFRydWUgaWYgcGFzc3dvcmQgbWVldHMgcmVxdWlyZW1lbnRzIChtaW4gOCBjaGFycywgMSB1cHBlcmNhc2UsIDEgbG93ZXJjYXNlLCAxIG51bWJlcilcbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIHZhbGlkYXRlUGFzc3dvcmQocGFzc3dvcmQ6IHN0cmluZyk6IGJvb2xlYW4ge1xuICBpZiAocGFzc3dvcmQubGVuZ3RoIDwgOCkge1xuICAgIHJldHVybiBmYWxzZTtcbiAgfVxuICBjb25zdCBoYXNVcHBlckNhc2UgPSAvW0EtWl0vLnRlc3QocGFzc3dvcmQpO1xuICBjb25zdCBoYXNMb3dlckNhc2UgPSAvW2Etel0vLnRlc3QocGFzc3dvcmQpO1xuICBjb25zdCBoYXNOdW1iZXIgPSAvWzAtOV0vLnRlc3QocGFzc3dvcmQpO1xuICByZXR1cm4gaGFzVXBwZXJDYXNlICYmIGhhc0xvd2VyQ2FzZSAmJiBoYXNOdW1iZXI7XG59XG5cbi8qKlxuICogVmFsaWRhdGVzIHRoYXQgYSBmaWVsZCBpcyBub3QgZW1wdHlcbiAqIEBwYXJhbSB2YWx1ZSAtIFZhbHVlIHRvIHZhbGlkYXRlXG4gKiBAcmV0dXJucyBUcnVlIGlmIHZhbHVlIGlzIG5vdCBlbXB0eSwgZmFsc2Ugb3RoZXJ3aXNlXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiB2YWxpZGF0ZVJlcXVpcmVkKHZhbHVlOiBzdHJpbmcpOiBib29sZWFuIHtcbiAgcmV0dXJuIHZhbHVlLnRyaW0oKS5sZW5ndGggPiAwO1xufVxuIl19

@@ -1,0 +1,63 @@
+// src/auth/authService.ts
+import { signIn, signUp, signOut, getCurrentUser, fetchUserAttributes, fetchAuthSession, } from "aws-amplify/auth";
+/**
+ * ✅ LOGIN
+ */
+export const loginUser = async (email, password) => {
+    await signIn({
+        username: email,
+        password,
+    });
+};
+/**
+ * ✅ SIGNUP
+ * Cognito'da name attribute'u standart attribute'tur.
+ * User Pool'unda name attribute kapalıysa burada hata alırsın.
+ * Hata alırsan attributes içinden name satırını kaldır.
+ */
+export const signupUser = async (email, password, name) => {
+    await signUp({
+        username: email,
+        password,
+        options: {
+            userAttributes: {
+                email,
+                name,
+            },
+        },
+    });
+};
+/**
+ * ✅ LOGOUT
+ */
+export const logoutUser = async () => {
+    await signOut();
+};
+/**
+ * ✅ CURRENT USER PROFILE (AuthContext bunu çağırıyor)
+ */
+export const getCurrentUserProfile = async () => {
+    const current = await getCurrentUser(); // throws if not signed in
+    const attrs = await fetchUserAttributes();
+    const email = attrs.email ?? "";
+    const name = attrs.name ?? attrs.given_name ?? current.username ?? "User";
+    const profile = {
+        id: current.userId ?? current.username,
+        email,
+        name,
+        role: "user",
+        createdAt: new Date().toISOString(),
+    };
+    return profile;
+};
+/**
+ * ✅ JWT token (API istekleri için Authorization: Bearer <token>)
+ */
+export const getIdToken = async () => {
+    const session = await fetchAuthSession();
+    const token = session.tokens?.idToken?.toString();
+    if (!token)
+        throw new Error("No id token found");
+    return token;
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXV0aFNlcnZpY2UuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJhdXRoU2VydmljZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSwwQkFBMEI7QUFDMUIsT0FBTyxFQUNMLE1BQU0sRUFDTixNQUFNLEVBQ04sT0FBTyxFQUNQLGNBQWMsRUFDZCxtQkFBbUIsRUFDbkIsZ0JBQWdCLEdBQ2pCLE1BQU0sa0JBQWtCLENBQUM7QUFJMUI7O0dBRUc7QUFDSCxNQUFNLENBQUMsTUFBTSxTQUFTLEdBQUcsS0FBSyxFQUFFLEtBQWEsRUFBRSxRQUFnQixFQUFpQixFQUFFO0lBQ2hGLE1BQU0sTUFBTSxDQUFDO1FBQ1gsUUFBUSxFQUFFLEtBQUs7UUFDZixRQUFRO0tBQ1QsQ0FBQyxDQUFDO0FBQ0wsQ0FBQyxDQUFDO0FBRUY7Ozs7O0dBS0c7QUFDSCxNQUFNLENBQUMsTUFBTSxVQUFVLEdBQUcsS0FBSyxFQUM3QixLQUFhLEVBQ2IsUUFBZ0IsRUFDaEIsSUFBWSxFQUNHLEVBQUU7SUFDakIsTUFBTSxNQUFNLENBQUM7UUFDWCxRQUFRLEVBQUUsS0FBSztRQUNmLFFBQVE7UUFDUixPQUFPLEVBQUU7WUFDUCxjQUFjLEVBQUU7Z0JBQ2QsS0FBSztnQkFDTCxJQUFJO2FBQ0w7U0FDRjtLQUNGLENBQUMsQ0FBQztBQUNMLENBQUMsQ0FBQztBQUVGOztHQUVHO0FBQ0gsTUFBTSxDQUFDLE1BQU0sVUFBVSxHQUFHLEtBQUssSUFBbUIsRUFBRTtJQUNsRCxNQUFNLE9BQU8sRUFBRSxDQUFDO0FBQ2xCLENBQUMsQ0FBQztBQUVGOztHQUVHO0FBQ0gsTUFBTSxDQUFDLE1BQU0scUJBQXFCLEdBQUcsS0FBSyxJQUFtQixFQUFFO0lBQzdELE1BQU0sT0FBTyxHQUFHLE1BQU0sY0FBYyxFQUFFLENBQUMsQ0FBQywwQkFBMEI7SUFDbEUsTUFBTSxLQUFLLEdBQUcsTUFBTSxtQkFBbUIsRUFBRSxDQUFDO0lBRTFDLE1BQU0sS0FBSyxHQUFHLEtBQUssQ0FBQyxLQUFLLElBQUksRUFBRSxDQUFDO0lBQ2hDLE1BQU0sSUFBSSxHQUFHLEtBQUssQ0FBQyxJQUFJLElBQUksS0FBSyxDQUFDLFVBQVUsSUFBSSxPQUFPLENBQUMsUUFBUSxJQUFJLE1BQU0sQ0FBQztJQUUxRSxNQUFNLE9BQU8sR0FBUztRQUNwQixFQUFFLEVBQUUsT0FBTyxDQUFDLE1BQU0sSUFBSSxPQUFPLENBQUMsUUFBUTtRQUN0QyxLQUFLO1FBQ0wsSUFBSTtRQUNKLElBQUksRUFBRSxNQUFNO1FBQ1osU0FBUyxFQUFFLElBQUksSUFBSSxFQUFFLENBQUMsV0FBVyxFQUFFO0tBQ3BDLENBQUM7SUFFRixPQUFPLE9BQU8sQ0FBQztBQUNqQixDQUFDLENBQUM7QUFFRjs7R0FFRztBQUNILE1BQU0sQ0FBQyxNQUFNLFVBQVUsR0FBRyxLQUFLLElBQXFCLEVBQUU7SUFDcEQsTUFBTSxPQUFPLEdBQUcsTUFBTSxnQkFBZ0IsRUFBRSxDQUFDO0lBQ3pDLE1BQU0sS0FBSyxHQUFHLE9BQU8sQ0FBQyxNQUFNLEVBQUUsT0FBTyxFQUFFLFFBQVEsRUFBRSxDQUFDO0lBRWxELElBQUksQ0FBQyxLQUFLO1FBQUUsTUFBTSxJQUFJLEtBQUssQ0FBQyxtQkFBbUIsQ0FBQyxDQUFDO0lBQ2pELE9BQU8sS0FBSyxDQUFDO0FBQ2YsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLy8gc3JjL2F1dGgvYXV0aFNlcnZpY2UudHNcbmltcG9ydCB7XG4gIHNpZ25JbixcbiAgc2lnblVwLFxuICBzaWduT3V0LFxuICBnZXRDdXJyZW50VXNlcixcbiAgZmV0Y2hVc2VyQXR0cmlidXRlcyxcbiAgZmV0Y2hBdXRoU2Vzc2lvbixcbn0gZnJvbSBcImF3cy1hbXBsaWZ5L2F1dGhcIjtcblxuaW1wb3J0IHR5cGUgeyBVc2VyIH0gZnJvbSBcIkAvdHlwZXNcIjtcblxuLyoqXG4gKiDinIUgTE9HSU5cbiAqL1xuZXhwb3J0IGNvbnN0IGxvZ2luVXNlciA9IGFzeW5jIChlbWFpbDogc3RyaW5nLCBwYXNzd29yZDogc3RyaW5nKTogUHJvbWlzZTx2b2lkPiA9PiB7XG4gIGF3YWl0IHNpZ25Jbih7XG4gICAgdXNlcm5hbWU6IGVtYWlsLFxuICAgIHBhc3N3b3JkLFxuICB9KTtcbn07XG5cbi8qKlxuICog4pyFIFNJR05VUFxuICogQ29nbml0bydkYSBuYW1lIGF0dHJpYnV0ZSd1IHN0YW5kYXJ0IGF0dHJpYnV0ZSd0dXIuXG4gKiBVc2VyIFBvb2wndW5kYSBuYW1lIGF0dHJpYnV0ZSBrYXBhbMSxeXNhIGJ1cmFkYSBoYXRhIGFsxLFyc8Sxbi5cbiAqIEhhdGEgYWzEsXJzYW4gYXR0cmlidXRlcyBpw6dpbmRlbiBuYW1lIHNhdMSxcsSxbsSxIGthbGTEsXIuXG4gKi9cbmV4cG9ydCBjb25zdCBzaWdudXBVc2VyID0gYXN5bmMgKFxuICBlbWFpbDogc3RyaW5nLFxuICBwYXNzd29yZDogc3RyaW5nLFxuICBuYW1lOiBzdHJpbmdcbik6IFByb21pc2U8dm9pZD4gPT4ge1xuICBhd2FpdCBzaWduVXAoe1xuICAgIHVzZXJuYW1lOiBlbWFpbCxcbiAgICBwYXNzd29yZCxcbiAgICBvcHRpb25zOiB7XG4gICAgICB1c2VyQXR0cmlidXRlczoge1xuICAgICAgICBlbWFpbCxcbiAgICAgICAgbmFtZSxcbiAgICAgIH0sXG4gICAgfSxcbiAgfSk7XG59O1xuXG4vKipcbiAqIOKchSBMT0dPVVRcbiAqL1xuZXhwb3J0IGNvbnN0IGxvZ291dFVzZXIgPSBhc3luYyAoKTogUHJvbWlzZTx2b2lkPiA9PiB7XG4gIGF3YWl0IHNpZ25PdXQoKTtcbn07XG5cbi8qKlxuICog4pyFIENVUlJFTlQgVVNFUiBQUk9GSUxFIChBdXRoQ29udGV4dCBidW51IMOnYcSfxLFyxLF5b3IpXG4gKi9cbmV4cG9ydCBjb25zdCBnZXRDdXJyZW50VXNlclByb2ZpbGUgPSBhc3luYyAoKTogUHJvbWlzZTxVc2VyPiA9PiB7XG4gIGNvbnN0IGN1cnJlbnQgPSBhd2FpdCBnZXRDdXJyZW50VXNlcigpOyAvLyB0aHJvd3MgaWYgbm90IHNpZ25lZCBpblxuICBjb25zdCBhdHRycyA9IGF3YWl0IGZldGNoVXNlckF0dHJpYnV0ZXMoKTtcblxuICBjb25zdCBlbWFpbCA9IGF0dHJzLmVtYWlsID8/IFwiXCI7XG4gIGNvbnN0IG5hbWUgPSBhdHRycy5uYW1lID8/IGF0dHJzLmdpdmVuX25hbWUgPz8gY3VycmVudC51c2VybmFtZSA/PyBcIlVzZXJcIjtcblxuICBjb25zdCBwcm9maWxlOiBVc2VyID0ge1xuICAgIGlkOiBjdXJyZW50LnVzZXJJZCA/PyBjdXJyZW50LnVzZXJuYW1lLFxuICAgIGVtYWlsLFxuICAgIG5hbWUsXG4gICAgcm9sZTogXCJ1c2VyXCIsXG4gICAgY3JlYXRlZEF0OiBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCksXG4gIH07XG5cbiAgcmV0dXJuIHByb2ZpbGU7XG59O1xuXG4vKipcbiAqIOKchSBKV1QgdG9rZW4gKEFQSSBpc3Rla2xlcmkgacOnaW4gQXV0aG9yaXphdGlvbjogQmVhcmVyIDx0b2tlbj4pXG4gKi9cbmV4cG9ydCBjb25zdCBnZXRJZFRva2VuID0gYXN5bmMgKCk6IFByb21pc2U8c3RyaW5nPiA9PiB7XG4gIGNvbnN0IHNlc3Npb24gPSBhd2FpdCBmZXRjaEF1dGhTZXNzaW9uKCk7XG4gIGNvbnN0IHRva2VuID0gc2Vzc2lvbi50b2tlbnM/LmlkVG9rZW4/LnRvU3RyaW5nKCk7XG5cbiAgaWYgKCF0b2tlbikgdGhyb3cgbmV3IEVycm9yKFwiTm8gaWQgdG9rZW4gZm91bmRcIik7XG4gIHJldHVybiB0b2tlbjtcbn07Il19

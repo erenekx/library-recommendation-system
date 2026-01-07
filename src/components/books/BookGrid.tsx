@@ -1,47 +1,22 @@
-import { Book } from '@/types';
 import { BookCard } from './BookCard';
-
-/**
- * BookGrid component props
- */
-interface BookGridProps {
-  books: Book[];
-}
-
 /**
  * BookGrid component displays books in a responsive grid layout
  *
  * @example
  * <BookGrid books={books} />
  */
-export function BookGrid({ books }: BookGridProps) {
-  if (books.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <svg
-          className="w-16 h-16 text-slate-400 mx-auto mb-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-          />
+export function BookGrid({ books }) {
+    if (books.length === 0) {
+        return (<div className="text-center py-12">
+        <svg className="w-16 h-16 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
         </svg>
         <p className="text-slate-600 text-lg">No books found</p>
         <p className="text-slate-500 text-sm mt-2">Try adjusting your search or filters</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {books.map((book) => (
-        <BookCard key={book.id} book={book} />
-      ))}
-    </div>
-  );
+      </div>);
+    }
+    return (<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {books.map((book) => (<BookCard key={book.id} book={book}/>))}
+    </div>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQm9va0dyaWQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJCb29rR3JpZC50c3giXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQ0EsT0FBTyxFQUFFLFFBQVEsRUFBRSxNQUFNLFlBQVksQ0FBQztBQVN0Qzs7Ozs7R0FLRztBQUNILE1BQU0sVUFBVSxRQUFRLENBQUMsRUFBRSxLQUFLLEVBQWlCO0lBQy9DLElBQUksS0FBSyxDQUFDLE1BQU0sS0FBSyxDQUFDLEVBQUUsQ0FBQztRQUN2QixPQUFPLENBQ0wsQ0FBQyxHQUFHLENBQUMsU0FBUyxDQUFDLG1CQUFtQixDQUNoQztRQUFBLENBQUMsR0FBRyxDQUNGLFNBQVMsQ0FBQyx1Q0FBdUMsQ0FDakQsSUFBSSxDQUFDLE1BQU0sQ0FDWCxNQUFNLENBQUMsY0FBYyxDQUNyQixPQUFPLENBQUMsV0FBVyxDQUVuQjtVQUFBLENBQUMsSUFBSSxDQUNILGFBQWEsQ0FBQyxPQUFPLENBQ3JCLGNBQWMsQ0FBQyxPQUFPLENBQ3RCLFdBQVcsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUNmLENBQUMsQ0FBQyxvUEFBb1AsRUFFMVA7UUFBQSxFQUFFLEdBQUcsQ0FDTDtRQUFBLENBQUMsQ0FBQyxDQUFDLFNBQVMsQ0FBQyx3QkFBd0IsQ0FBQyxjQUFjLEVBQUUsQ0FBQyxDQUN2RDtRQUFBLENBQUMsQ0FBQyxDQUFDLFNBQVMsQ0FBQyw2QkFBNkIsQ0FBQyxvQ0FBb0MsRUFBRSxDQUFDLENBQ3BGO01BQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUFDO0lBQ0osQ0FBQztJQUVELE9BQU8sQ0FDTCxDQUFDLEdBQUcsQ0FBQyxTQUFTLENBQUMscUVBQXFFLENBQ2xGO01BQUEsQ0FBQyxLQUFLLENBQUMsR0FBRyxDQUFDLENBQUMsSUFBSSxFQUFFLEVBQUUsQ0FBQyxDQUNuQixDQUFDLFFBQVEsQ0FBQyxHQUFHLENBQUMsQ0FBQyxJQUFJLENBQUMsRUFBRSxDQUFDLENBQUMsSUFBSSxDQUFDLENBQUMsSUFBSSxDQUFDLEVBQUcsQ0FDdkMsQ0FBQyxDQUNKO0lBQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEJvb2sgfSBmcm9tICdAL3R5cGVzJztcbmltcG9ydCB7IEJvb2tDYXJkIH0gZnJvbSAnLi9Cb29rQ2FyZCc7XG5cbi8qKlxuICogQm9va0dyaWQgY29tcG9uZW50IHByb3BzXG4gKi9cbmludGVyZmFjZSBCb29rR3JpZFByb3BzIHtcbiAgYm9va3M6IEJvb2tbXTtcbn1cblxuLyoqXG4gKiBCb29rR3JpZCBjb21wb25lbnQgZGlzcGxheXMgYm9va3MgaW4gYSByZXNwb25zaXZlIGdyaWQgbGF5b3V0XG4gKlxuICogQGV4YW1wbGVcbiAqIDxCb29rR3JpZCBib29rcz17Ym9va3N9IC8+XG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBCb29rR3JpZCh7IGJvb2tzIH06IEJvb2tHcmlkUHJvcHMpIHtcbiAgaWYgKGJvb2tzLmxlbmd0aCA9PT0gMCkge1xuICAgIHJldHVybiAoXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHB5LTEyXCI+XG4gICAgICAgIDxzdmdcbiAgICAgICAgICBjbGFzc05hbWU9XCJ3LTE2IGgtMTYgdGV4dC1zbGF0ZS00MDAgbXgtYXV0byBtYi00XCJcbiAgICAgICAgICBmaWxsPVwibm9uZVwiXG4gICAgICAgICAgc3Ryb2tlPVwiY3VycmVudENvbG9yXCJcbiAgICAgICAgICB2aWV3Qm94PVwiMCAwIDI0IDI0XCJcbiAgICAgICAgPlxuICAgICAgICAgIDxwYXRoXG4gICAgICAgICAgICBzdHJva2VMaW5lY2FwPVwicm91bmRcIlxuICAgICAgICAgICAgc3Ryb2tlTGluZWpvaW49XCJyb3VuZFwiXG4gICAgICAgICAgICBzdHJva2VXaWR0aD17Mn1cbiAgICAgICAgICAgIGQ9XCJNMTIgNi4yNTN2MTNtMC0xM0MxMC44MzIgNS40NzcgOS4yNDYgNSA3LjUgNVM0LjE2OCA1LjQ3NyAzIDYuMjUzdjEzQzQuMTY4IDE4LjQ3NyA1Ljc1NCAxOCA3LjUgMThzMy4zMzIuNDc3IDQuNSAxLjI1M20wLTEzQzEzLjE2OCA1LjQ3NyAxNC43NTQgNSAxNi41IDVjMS43NDcgMCAzLjMzMi40NzcgNC41IDEuMjUzdjEzQzE5LjgzMiAxOC40NzcgMTguMjQ3IDE4IDE2LjUgMThjLTEuNzQ2IDAtMy4zMzIuNDc3LTQuNSAxLjI1M1wiXG4gICAgICAgICAgLz5cbiAgICAgICAgPC9zdmc+XG4gICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc2xhdGUtNjAwIHRleHQtbGdcIj5ObyBib29rcyBmb3VuZDwvcD5cbiAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbGF0ZS01MDAgdGV4dC1zbSBtdC0yXCI+VHJ5IGFkanVzdGluZyB5b3VyIHNlYXJjaCBvciBmaWx0ZXJzPC9wPlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIHNtOmdyaWQtY29scy0yIGxnOmdyaWQtY29scy0zIHhsOmdyaWQtY29scy00IGdhcC02XCI+XG4gICAgICB7Ym9va3MubWFwKChib29rKSA9PiAoXG4gICAgICAgIDxCb29rQ2FyZCBrZXk9e2Jvb2suaWR9IGJvb2s9e2Jvb2t9IC8+XG4gICAgICApKX1cbiAgICA8L2Rpdj5cbiAgKTtcbn1cbiJdfQ==

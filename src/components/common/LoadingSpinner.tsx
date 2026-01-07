@@ -1,29 +1,17 @@
 /**
- * LoadingSpinner component props
- */
-interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
-  color?: string;
-}
-
-/**
  * Reusable LoadingSpinner component with size variants
  *
  * @example
  * <LoadingSpinner size="md" color="text-primary-600" />
  */
-export function LoadingSpinner({ size = 'md', color = 'text-primary-600' }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-  };
-
-  return (
-    <div className="flex justify-center items-center">
-      <div
-        className={`${sizeClasses[size]} ${color} animate-spin rounded-full border-4 border-gray-200 border-t-current`}
-      />
-    </div>
-  );
+export function LoadingSpinner({ size = 'md', color = 'text-primary-600' }) {
+    const sizeClasses = {
+        sm: 'w-4 h-4',
+        md: 'w-8 h-8',
+        lg: 'w-12 h-12',
+    };
+    return (<div className="flex justify-center items-center">
+      <div className={`${sizeClasses[size]} ${color} animate-spin rounded-full border-4 border-gray-200 border-t-current`}/>
+    </div>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTG9hZGluZ1NwaW5uZXIuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJMb2FkaW5nU3Bpbm5lci50c3giXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBUUE7Ozs7O0dBS0c7QUFDSCxNQUFNLFVBQVUsY0FBYyxDQUFDLEVBQUUsSUFBSSxHQUFHLElBQUksRUFBRSxLQUFLLEdBQUcsa0JBQWtCLEVBQXVCO0lBQzdGLE1BQU0sV0FBVyxHQUFHO1FBQ2xCLEVBQUUsRUFBRSxTQUFTO1FBQ2IsRUFBRSxFQUFFLFNBQVM7UUFDYixFQUFFLEVBQUUsV0FBVztLQUNoQixDQUFDO0lBRUYsT0FBTyxDQUNMLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxrQ0FBa0MsQ0FDL0M7TUFBQSxDQUFDLEdBQUcsQ0FDRixTQUFTLENBQUMsQ0FBQyxHQUFHLFdBQVcsQ0FBQyxJQUFJLENBQUMsSUFBSSxLQUFLLHNFQUFzRSxDQUFDLEVBRW5IO0lBQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogTG9hZGluZ1NwaW5uZXIgY29tcG9uZW50IHByb3BzXG4gKi9cbmludGVyZmFjZSBMb2FkaW5nU3Bpbm5lclByb3BzIHtcbiAgc2l6ZT86ICdzbScgfCAnbWQnIHwgJ2xnJztcbiAgY29sb3I/OiBzdHJpbmc7XG59XG5cbi8qKlxuICogUmV1c2FibGUgTG9hZGluZ1NwaW5uZXIgY29tcG9uZW50IHdpdGggc2l6ZSB2YXJpYW50c1xuICpcbiAqIEBleGFtcGxlXG4gKiA8TG9hZGluZ1NwaW5uZXIgc2l6ZT1cIm1kXCIgY29sb3I9XCJ0ZXh0LXByaW1hcnktNjAwXCIgLz5cbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIExvYWRpbmdTcGlubmVyKHsgc2l6ZSA9ICdtZCcsIGNvbG9yID0gJ3RleHQtcHJpbWFyeS02MDAnIH06IExvYWRpbmdTcGlubmVyUHJvcHMpIHtcbiAgY29uc3Qgc2l6ZUNsYXNzZXMgPSB7XG4gICAgc206ICd3LTQgaC00JyxcbiAgICBtZDogJ3ctOCBoLTgnLFxuICAgIGxnOiAndy0xMiBoLTEyJyxcbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWNlbnRlciBpdGVtcy1jZW50ZXJcIj5cbiAgICAgIDxkaXZcbiAgICAgICAgY2xhc3NOYW1lPXtgJHtzaXplQ2xhc3Nlc1tzaXplXX0gJHtjb2xvcn0gYW5pbWF0ZS1zcGluIHJvdW5kZWQtZnVsbCBib3JkZXItNCBib3JkZXItZ3JheS0yMDAgYm9yZGVyLXQtY3VycmVudGB9XG4gICAgICAvPlxuICAgIDwvZGl2PlxuICApO1xufVxuIl19

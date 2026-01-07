@@ -1,29 +1,30 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Navigation } from './Navigation';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Navigation } from "./Navigation";
+import { useAuth } from "@/hooks/useAuth";
 
-/**
- * Modern Header component with glass morphism effect
- *
- * Displays logo, navigation links, and user profile dropdown
- */
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      setIsMobileMenuOpen(false);
+      navigate("/login");
+    }
+  };
 
   return (
     <header className="glass-effect sticky top-0 z-50 border-b border-white/20 shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:shadow-xl group-hover:shadow-violet-500/40 transition-all duration-300 group-hover:scale-110">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -36,69 +37,92 @@ export function Header() {
             <span className="text-xl font-bold gradient-text">LibraryAI</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:block">
             <Navigation />
           </div>
 
-          {/* User Actions */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link
-              to="/login"
-              className="text-slate-700 hover:text-violet-600 transition-colors font-semibold px-4 py-2 rounded-lg hover:bg-violet-50"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 font-semibold transform hover:-translate-y-0.5"
-            >
-              Sign Up
-            </Link>
+            {user ? (
+              <>
+                <span className="text-slate-700 font-semibold px-3 py-2 rounded-lg bg-white/40 border border-white/30">
+                  {user.name || user.email || "User"}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-slate-700 hover:text-violet-600 transition-colors font-semibold px-4 py-2 rounded-lg hover:bg-violet-50"
+                  type="button"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-slate-700 hover:text-violet-600 transition-colors font-semibold px-4 py-2 rounded-lg hover:bg-violet-50"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 font-semibold transform hover:-translate-y-0.5"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden text-slate-700 hover:text-violet-600 transition-colors p-2 rounded-lg hover:bg-violet-50"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            type="button"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-white/20 animate-slide-in">
             <Navigation mobile />
             <div className="mt-4 space-y-2">
-              <Link
-                to="/login"
-                className="block text-slate-700 hover:text-violet-600 transition-colors py-2 px-4 rounded-lg hover:bg-violet-50 font-semibold"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="block bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-4 py-2.5 rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all text-center font-semibold shadow-lg shadow-violet-500/30"
-              >
-                Sign Up
-              </Link>
+              {user ? (
+                <>
+                  <div className="block text-slate-700 py-2 px-4 rounded-lg bg-white/40 border border-white/30 font-semibold">
+                    {user.name || user.email || "User"}
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left text-slate-700 hover:text-violet-600 transition-colors py-2 px-4 rounded-lg hover:bg-violet-50 font-semibold"
+                    type="button"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block text-slate-700 hover:text-violet-600 transition-colors py-2 px-4 rounded-lg hover:bg-violet-50 font-semibold"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="block bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-4 py-2.5 rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all text-center font-semibold shadow-lg shadow-violet-500/30"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

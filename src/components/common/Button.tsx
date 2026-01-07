@@ -1,14 +1,4 @@
 import React from 'react';
-
-/**
- * Button component props
- */
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'gradient' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
-  children: React.ReactNode;
-}
-
 /**
  * Modern Button component with beautiful gradients and animations
  *
@@ -17,41 +7,23 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  *   Click Me
  * </Button>
  */
-export function Button({
-  variant = 'primary',
-  size = 'md',
-  children,
-  className = '',
-  disabled,
-  ...props
-}: ButtonProps) {
-  const baseClasses =
-    'rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-4';
-
-  const variantClasses = {
-    primary:
-      'bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 focus:ring-violet-500/20',
-    secondary:
-      'bg-white text-slate-700 hover:bg-slate-50 shadow-md hover:shadow-lg border-2 border-slate-200 hover:border-violet-300 focus:ring-violet-500/20',
-    danger:
-      'bg-gradient-to-r from-rose-600 to-pink-600 text-white hover:from-rose-700 hover:to-pink-700 shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 focus:ring-rose-500/20',
-    gradient:
-      'bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 text-white hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 shadow-lg shadow-pink-500/30 hover:shadow-xl hover:shadow-pink-500/40 focus:ring-pink-500/20',
-    outline:
-      'bg-transparent text-violet-600 hover:bg-violet-50 border-2 border-violet-600 hover:border-violet-700 focus:ring-violet-500/20',
-  };
-
-  const sizeClasses = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-2.5 text-base',
-    lg: 'px-8 py-3.5 text-lg',
-  };
-
-  const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
-
-  return (
-    <button className={classes} disabled={disabled} {...props}>
+export function Button({ variant = 'primary', size = 'md', children, className = '', disabled, ...props }) {
+    const baseClasses = 'rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-4';
+    const variantClasses = {
+        primary: 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 focus:ring-violet-500/20',
+        secondary: 'bg-white text-slate-700 hover:bg-slate-50 shadow-md hover:shadow-lg border-2 border-slate-200 hover:border-violet-300 focus:ring-violet-500/20',
+        danger: 'bg-gradient-to-r from-rose-600 to-pink-600 text-white hover:from-rose-700 hover:to-pink-700 shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 focus:ring-rose-500/20',
+        gradient: 'bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 text-white hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 shadow-lg shadow-pink-500/30 hover:shadow-xl hover:shadow-pink-500/40 focus:ring-pink-500/20',
+        outline: 'bg-transparent text-violet-600 hover:bg-violet-50 border-2 border-violet-600 hover:border-violet-700 focus:ring-violet-500/20',
+    };
+    const sizeClasses = {
+        sm: 'px-4 py-2 text-sm',
+        md: 'px-6 py-2.5 text-base',
+        lg: 'px-8 py-3.5 text-lg',
+    };
+    const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+    return (<button className={classes} disabled={disabled} {...props}>
       {children}
-    </button>
-  );
+    </button>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQnV0dG9uLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiQnV0dG9uLnRzeCJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEtBQUssTUFBTSxPQUFPLENBQUM7QUFXMUI7Ozs7Ozs7R0FPRztBQUNILE1BQU0sVUFBVSxNQUFNLENBQUMsRUFDckIsT0FBTyxHQUFHLFNBQVMsRUFDbkIsSUFBSSxHQUFHLElBQUksRUFDWCxRQUFRLEVBQ1IsU0FBUyxHQUFHLEVBQUUsRUFDZCxRQUFRLEVBQ1IsR0FBRyxLQUFLLEVBQ0k7SUFDWixNQUFNLFdBQVcsR0FDZiw0TEFBNEwsQ0FBQztJQUUvTCxNQUFNLGNBQWMsR0FBRztRQUNyQixPQUFPLEVBQ0wsd01BQXdNO1FBQzFNLFNBQVMsRUFDUCxnSkFBZ0o7UUFDbEosTUFBTSxFQUNKLDBMQUEwTDtRQUM1TCxRQUFRLEVBQ04sOE5BQThOO1FBQ2hPLE9BQU8sRUFDTCwrSEFBK0g7S0FDbEksQ0FBQztJQUVGLE1BQU0sV0FBVyxHQUFHO1FBQ2xCLEVBQUUsRUFBRSxtQkFBbUI7UUFDdkIsRUFBRSxFQUFFLHVCQUF1QjtRQUMzQixFQUFFLEVBQUUscUJBQXFCO0tBQzFCLENBQUM7SUFFRixNQUFNLE9BQU8sR0FBRyxHQUFHLFdBQVcsSUFBSSxjQUFjLENBQUMsT0FBTyxDQUFDLElBQUksV0FBVyxDQUFDLElBQUksQ0FBQyxJQUFJLFNBQVMsRUFBRSxDQUFDO0lBRTlGLE9BQU8sQ0FDTCxDQUFDLE1BQU0sQ0FBQyxTQUFTLENBQUMsQ0FBQyxPQUFPLENBQUMsQ0FBQyxRQUFRLENBQUMsQ0FBQyxRQUFRLENBQUMsQ0FBQyxJQUFJLEtBQUssQ0FBQyxDQUN4RDtNQUFBLENBQUMsUUFBUSxDQUNYO0lBQUEsRUFBRSxNQUFNLENBQUMsQ0FDVixDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5cbi8qKlxuICogQnV0dG9uIGNvbXBvbmVudCBwcm9wc1xuICovXG5pbnRlcmZhY2UgQnV0dG9uUHJvcHMgZXh0ZW5kcyBSZWFjdC5CdXR0b25IVE1MQXR0cmlidXRlczxIVE1MQnV0dG9uRWxlbWVudD4ge1xuICB2YXJpYW50PzogJ3ByaW1hcnknIHwgJ3NlY29uZGFyeScgfCAnZGFuZ2VyJyB8ICdncmFkaWVudCcgfCAnb3V0bGluZSc7XG4gIHNpemU/OiAnc20nIHwgJ21kJyB8ICdsZyc7XG4gIGNoaWxkcmVuOiBSZWFjdC5SZWFjdE5vZGU7XG59XG5cbi8qKlxuICogTW9kZXJuIEJ1dHRvbiBjb21wb25lbnQgd2l0aCBiZWF1dGlmdWwgZ3JhZGllbnRzIGFuZCBhbmltYXRpb25zXG4gKlxuICogQGV4YW1wbGVcbiAqIDxCdXR0b24gdmFyaWFudD1cInByaW1hcnlcIiBzaXplPVwibWRcIiBvbkNsaWNrPXtoYW5kbGVDbGlja30+XG4gKiAgIENsaWNrIE1lXG4gKiA8L0J1dHRvbj5cbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIEJ1dHRvbih7XG4gIHZhcmlhbnQgPSAncHJpbWFyeScsXG4gIHNpemUgPSAnbWQnLFxuICBjaGlsZHJlbixcbiAgY2xhc3NOYW1lID0gJycsXG4gIGRpc2FibGVkLFxuICAuLi5wcm9wc1xufTogQnV0dG9uUHJvcHMpIHtcbiAgY29uc3QgYmFzZUNsYXNzZXMgPVxuICAgICdyb3VuZGVkLXhsIGZvbnQtc2VtaWJvbGQgdHJhbnNpdGlvbi1hbGwgZHVyYXRpb24tMzAwIGRpc2FibGVkOm9wYWNpdHktNTAgZGlzYWJsZWQ6Y3Vyc29yLW5vdC1hbGxvd2VkIHRyYW5zZm9ybSBob3ZlcjotdHJhbnNsYXRlLXktMC41IGFjdGl2ZTp0cmFuc2xhdGUteS0wIGZvY3VzOm91dGxpbmUtbm9uZSBmb2N1czpyaW5nLTQnO1xuXG4gIGNvbnN0IHZhcmlhbnRDbGFzc2VzID0ge1xuICAgIHByaW1hcnk6XG4gICAgICAnYmctZ3JhZGllbnQtdG8tciBmcm9tLXZpb2xldC02MDAgdG8taW5kaWdvLTYwMCB0ZXh0LXdoaXRlIGhvdmVyOmZyb20tdmlvbGV0LTcwMCBob3Zlcjp0by1pbmRpZ28tNzAwIHNoYWRvdy1sZyBzaGFkb3ctdmlvbGV0LTUwMC8zMCBob3ZlcjpzaGFkb3cteGwgaG92ZXI6c2hhZG93LXZpb2xldC01MDAvNDAgZm9jdXM6cmluZy12aW9sZXQtNTAwLzIwJyxcbiAgICBzZWNvbmRhcnk6XG4gICAgICAnYmctd2hpdGUgdGV4dC1zbGF0ZS03MDAgaG92ZXI6Ymctc2xhdGUtNTAgc2hhZG93LW1kIGhvdmVyOnNoYWRvdy1sZyBib3JkZXItMiBib3JkZXItc2xhdGUtMjAwIGhvdmVyOmJvcmRlci12aW9sZXQtMzAwIGZvY3VzOnJpbmctdmlvbGV0LTUwMC8yMCcsXG4gICAgZGFuZ2VyOlxuICAgICAgJ2JnLWdyYWRpZW50LXRvLXIgZnJvbS1yb3NlLTYwMCB0by1waW5rLTYwMCB0ZXh0LXdoaXRlIGhvdmVyOmZyb20tcm9zZS03MDAgaG92ZXI6dG8tcGluay03MDAgc2hhZG93LWxnIHNoYWRvdy1yb3NlLTUwMC8zMCBob3ZlcjpzaGFkb3cteGwgaG92ZXI6c2hhZG93LXJvc2UtNTAwLzQwIGZvY3VzOnJpbmctcm9zZS01MDAvMjAnLFxuICAgIGdyYWRpZW50OlxuICAgICAgJ2JnLWdyYWRpZW50LXRvLXIgZnJvbS1vcmFuZ2UtNTAwIHZpYS1waW5rLTUwMCB0by1yb3NlLTUwMCB0ZXh0LXdoaXRlIGhvdmVyOmZyb20tb3JhbmdlLTYwMCBob3Zlcjp2aWEtcGluay02MDAgaG92ZXI6dG8tcm9zZS02MDAgc2hhZG93LWxnIHNoYWRvdy1waW5rLTUwMC8zMCBob3ZlcjpzaGFkb3cteGwgaG92ZXI6c2hhZG93LXBpbmstNTAwLzQwIGZvY3VzOnJpbmctcGluay01MDAvMjAnLFxuICAgIG91dGxpbmU6XG4gICAgICAnYmctdHJhbnNwYXJlbnQgdGV4dC12aW9sZXQtNjAwIGhvdmVyOmJnLXZpb2xldC01MCBib3JkZXItMiBib3JkZXItdmlvbGV0LTYwMCBob3Zlcjpib3JkZXItdmlvbGV0LTcwMCBmb2N1czpyaW5nLXZpb2xldC01MDAvMjAnLFxuICB9O1xuXG4gIGNvbnN0IHNpemVDbGFzc2VzID0ge1xuICAgIHNtOiAncHgtNCBweS0yIHRleHQtc20nLFxuICAgIG1kOiAncHgtNiBweS0yLjUgdGV4dC1iYXNlJyxcbiAgICBsZzogJ3B4LTggcHktMy41IHRleHQtbGcnLFxuICB9O1xuXG4gIGNvbnN0IGNsYXNzZXMgPSBgJHtiYXNlQ2xhc3Nlc30gJHt2YXJpYW50Q2xhc3Nlc1t2YXJpYW50XX0gJHtzaXplQ2xhc3Nlc1tzaXplXX0gJHtjbGFzc05hbWV9YDtcblxuICByZXR1cm4gKFxuICAgIDxidXR0b24gY2xhc3NOYW1lPXtjbGFzc2VzfSBkaXNhYmxlZD17ZGlzYWJsZWR9IHsuLi5wcm9wc30+XG4gICAgICB7Y2hpbGRyZW59XG4gICAgPC9idXR0b24+XG4gICk7XG59XG4iXX0=

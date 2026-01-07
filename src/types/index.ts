@@ -1,55 +1,5 @@
 /**
  * Core type definitions for the Library Recommendation System
  */
-
-export interface Book {
-  id: string;
-  title: string;
-  author: string;
-  genre: string;
-  description: string;
-  coverImage: string;
-  rating: number;
-  publishedYear: number;
-  isbn: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'user' | 'admin';
-  createdAt: string;
-}
-
-export interface ReadingList {
-  id: string;
-  userId: string;
-  name: string;
-  description: string;
-  bookIds: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Review {
-  id: string;
-  bookId: string;
-  userId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-}
-
-export interface Recommendation {
-  id: string;
-  bookId: string;
-  reason: string;
-  confidence: number;
-}
-
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-}
+export {};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7R0FFRyIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQ29yZSB0eXBlIGRlZmluaXRpb25zIGZvciB0aGUgTGlicmFyeSBSZWNvbW1lbmRhdGlvbiBTeXN0ZW1cbiAqL1xuXG5leHBvcnQgaW50ZXJmYWNlIEJvb2sge1xuICBpZDogc3RyaW5nO1xuICB0aXRsZTogc3RyaW5nO1xuICBhdXRob3I6IHN0cmluZztcbiAgZ2VucmU6IHN0cmluZztcbiAgZGVzY3JpcHRpb246IHN0cmluZztcbiAgY292ZXJJbWFnZTogc3RyaW5nO1xuICByYXRpbmc6IG51bWJlcjtcbiAgcHVibGlzaGVkWWVhcjogbnVtYmVyO1xuICBpc2JuOiBzdHJpbmc7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgVXNlciB7XG4gIGlkOiBzdHJpbmc7XG4gIGVtYWlsOiBzdHJpbmc7XG4gIG5hbWU6IHN0cmluZztcbiAgcm9sZTogJ3VzZXInIHwgJ2FkbWluJztcbiAgY3JlYXRlZEF0OiBzdHJpbmc7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgUmVhZGluZ0xpc3Qge1xuICBpZDogc3RyaW5nO1xuICB1c2VySWQ6IHN0cmluZztcbiAgbmFtZTogc3RyaW5nO1xuICBkZXNjcmlwdGlvbjogc3RyaW5nO1xuICBib29rSWRzOiBzdHJpbmdbXTtcbiAgY3JlYXRlZEF0OiBzdHJpbmc7XG4gIHVwZGF0ZWRBdDogc3RyaW5nO1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIFJldmlldyB7XG4gIGlkOiBzdHJpbmc7XG4gIGJvb2tJZDogc3RyaW5nO1xuICB1c2VySWQ6IHN0cmluZztcbiAgcmF0aW5nOiBudW1iZXI7XG4gIGNvbW1lbnQ6IHN0cmluZztcbiAgY3JlYXRlZEF0OiBzdHJpbmc7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgUmVjb21tZW5kYXRpb24ge1xuICBpZDogc3RyaW5nO1xuICBib29rSWQ6IHN0cmluZztcbiAgcmVhc29uOiBzdHJpbmc7XG4gIGNvbmZpZGVuY2U6IG51bWJlcjtcbn1cblxuZXhwb3J0IGludGVyZmFjZSBBdXRoU3RhdGUge1xuICB1c2VyOiBVc2VyIHwgbnVsbDtcbiAgaXNBdXRoZW50aWNhdGVkOiBib29sZWFuO1xuICBpc0xvYWRpbmc6IGJvb2xlYW47XG59XG4iXX0=

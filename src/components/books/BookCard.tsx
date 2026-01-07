@@ -1,90 +1,73 @@
-import { useNavigate } from 'react-router-dom';
-import { Book } from '@/types';
-import { formatRating } from '@/utils/formatters';
-import { Button } from '@/components/common/Button';
-
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+const FALLBACK = "/book-covers/no-cover.jpg";
 /**
- * BookCard component props
+ * coverImage ne gelirse gelsin:
+ * - dış URL/placeholder'ı asla kullanma (offline / DNS patlar)
+ * - "/book-covers/xxx.jpg" veya "xxx.jpg" veya " /book-covers/xxx.jpg " -> normalize et
+ * - bozuk karakterleri temizle (virgül gibi)
+ * - dosya adını encode et (space vs. için)
  */
-interface BookCardProps {
-  book: Book;
+function normalizeCover(input) {
+    if (!input)
+        return FALLBACK;
+    let s = String(input).trim();
+    // Boşsa
+    if (!s)
+        return FALLBACK;
+    // dış placeholder/dış url istemiyoruz
+    if (s.includes("via.placeholder.com"))
+        return FALLBACK;
+    if (s.startsWith("http://") || s.startsWith("https://"))
+        return FALLBACK;
+    // "/book-covers/xxx.jpg" gibi path geldiyse dosya adını çek
+    // veya "xxx.jpg" geldiyse olduğu gibi al
+    const prefix = "/book-covers/";
+    let file = s.startsWith(prefix) ? s.slice(prefix.length) : s;
+    // bazen saçma karakterler geliyor: ",atomic-habits.jpg" gibi
+    // baştaki/sondaki problemli karakterleri temizle
+    file = file.trim().replace(/^,+/, "").replace(/\s+/g, " ");
+    // hâlâ boşsa
+    if (!file)
+        return FALLBACK;
+    // güvenli URL
+    return `${prefix}${encodeURIComponent(file)}`;
 }
+export function BookCard({ book }) {
+    const normalized = useMemo(() => normalizeCover(book.coverImage), [book.coverImage]);
+    const [imgSrc, setImgSrc] = useState(normalized);
+    useEffect(() => {
+        setImgSrc(normalizeCover(book.coverImage));
+    }, [book.coverImage]);
+    return (<div className="glass-effect rounded-2xl shadow-xl border border-white/20 overflow-hidden hover-glow transition-all duration-300">
+      <div className="relative">
+        <img src={imgSrc} alt={book.title} className="w-full h-[420px] object-cover block" loading="lazy" onError={() => {
+            // burada fallback'e al
+            setImgSrc(FALLBACK);
+        }} onLoad={() => {
+            // debug: doğru path mi yüklendi gör
+            // iş bitince silebilirsin
+            // console.log("Loaded cover:", imgSrc);
+        }}/>
 
-/**
- * Modern BookCard with beautiful hover effects and gradients
- *
- * @example
- * <BookCard book={book} />
- */
-export function BookCard({ book }: BookCardProps) {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(`/books/${book.id}`);
-  };
-
-  return (
-    <div
-      className="glass-effect rounded-2xl overflow-hidden card-hover cursor-pointer group border border-white/20 hover-glow"
-      onClick={handleClick}
-    >
-      <div className="relative overflow-hidden">
-        <img
-          src={book.coverImage}
-          alt={book.title}
-          className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-700"
-          onError={(e) => {
-            e.currentTarget.src = 'https://via.placeholder.com/300x400?text=No+Cover';
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="w-full"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            View Details
-          </Button>
-        </div>
-
-        {/* Floating Badge */}
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
-            <div className="flex items-center">
-              <svg className="w-4 h-4 text-amber-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span className="text-sm font-bold text-slate-900">{formatRating(book.rating)}</span>
-            </div>
-          </div>
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow">
+          <span className="font-bold">⭐ {book.rating}</span>
         </div>
       </div>
 
       <div className="p-6">
-        <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-violet-600 transition-colors">
-          {book.title}
-        </h3>
-        <p className="text-sm text-slate-600 mb-4 font-medium">{book.author}</p>
-        <div className="flex items-center justify-between">
-          <span className="badge-modern">{book.genre}</span>
-          <div className="flex items-center text-slate-500">
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="text-xs font-medium">{book.publishedYear}</span>
-          </div>
+        <h3 className="text-xl font-extrabold text-slate-900 mb-1 line-clamp-2">{book.title}</h3>
+        <p className="text-slate-600 font-medium mb-4">{book.author}</p>
+
+        <div className="flex items-center justify-between mb-5">
+          <span className="badge-gradient px-3 py-1.5 text-sm">{book.genre}</span>
+          <span className="text-slate-500 text-sm font-semibold">{book.publishedYear}</span>
         </div>
+
+        <Link to={`/books/${book.id}`} className="w-full inline-flex items-center justify-center rounded-xl px-4 py-3 font-bold bg-white border border-slate-200 hover:border-violet-300 hover:text-violet-700 transition">
+          View Details
+        </Link>
       </div>
-    </div>
-  );
+    </div>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQm9va0NhcmQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJCb29rQ2FyZC50c3giXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxPQUFPLEVBQUUsUUFBUSxFQUFFLE1BQU0sT0FBTyxDQUFDO0FBQ3JELE9BQU8sRUFBRSxJQUFJLEVBQUUsTUFBTSxrQkFBa0IsQ0FBQztBQU94QyxNQUFNLFFBQVEsR0FBRywyQkFBMkIsQ0FBQztBQUU3Qzs7Ozs7O0dBTUc7QUFDSCxTQUFTLGNBQWMsQ0FBQyxLQUFxQjtJQUMzQyxJQUFJLENBQUMsS0FBSztRQUFFLE9BQU8sUUFBUSxDQUFDO0lBRTVCLElBQUksQ0FBQyxHQUFHLE1BQU0sQ0FBQyxLQUFLLENBQUMsQ0FBQyxJQUFJLEVBQUUsQ0FBQztJQUU3QixRQUFRO0lBQ1IsSUFBSSxDQUFDLENBQUM7UUFBRSxPQUFPLFFBQVEsQ0FBQztJQUV4QixzQ0FBc0M7SUFDdEMsSUFBSSxDQUFDLENBQUMsUUFBUSxDQUFDLHFCQUFxQixDQUFDO1FBQUUsT0FBTyxRQUFRLENBQUM7SUFDdkQsSUFBSSxDQUFDLENBQUMsVUFBVSxDQUFDLFNBQVMsQ0FBQyxJQUFJLENBQUMsQ0FBQyxVQUFVLENBQUMsVUFBVSxDQUFDO1FBQUUsT0FBTyxRQUFRLENBQUM7SUFFekUsNERBQTREO0lBQzVELHlDQUF5QztJQUN6QyxNQUFNLE1BQU0sR0FBRyxlQUFlLENBQUM7SUFDL0IsSUFBSSxJQUFJLEdBQUcsQ0FBQyxDQUFDLFVBQVUsQ0FBQyxNQUFNLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLEtBQUssQ0FBQyxNQUFNLENBQUMsTUFBTSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQztJQUU3RCw2REFBNkQ7SUFDN0QsaURBQWlEO0lBQ2pELElBQUksR0FBRyxJQUFJLENBQUMsSUFBSSxFQUFFLENBQUMsT0FBTyxDQUFDLEtBQUssRUFBRSxFQUFFLENBQUMsQ0FBQyxPQUFPLENBQUMsTUFBTSxFQUFFLEdBQUcsQ0FBQyxDQUFDO0lBRTNELGFBQWE7SUFDYixJQUFJLENBQUMsSUFBSTtRQUFFLE9BQU8sUUFBUSxDQUFDO0lBRTNCLGNBQWM7SUFDZCxPQUFPLEdBQUcsTUFBTSxHQUFHLGtCQUFrQixDQUFDLElBQUksQ0FBQyxFQUFFLENBQUM7QUFDaEQsQ0FBQztBQUVELE1BQU0sVUFBVSxRQUFRLENBQUMsRUFBRSxJQUFJLEVBQVM7SUFDdEMsTUFBTSxVQUFVLEdBQUcsT0FBTyxDQUFDLEdBQUcsRUFBRSxDQUFDLGNBQWMsQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLEVBQUUsQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLENBQUMsQ0FBQztJQUNyRixNQUFNLENBQUMsTUFBTSxFQUFFLFNBQVMsQ0FBQyxHQUFHLFFBQVEsQ0FBQyxVQUFVLENBQUMsQ0FBQztJQUVqRCxTQUFTLENBQUMsR0FBRyxFQUFFO1FBQ2IsU0FBUyxDQUFDLGNBQWMsQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLENBQUMsQ0FBQztJQUM3QyxDQUFDLEVBQUUsQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLENBQUMsQ0FBQztJQUV0QixPQUFPLENBQ0wsQ0FBQyxHQUFHLENBQUMsU0FBUyxDQUFDLGtIQUFrSCxDQUMvSDtNQUFBLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxVQUFVLENBQ3ZCO1FBQUEsQ0FBQyxHQUFHLENBQ0YsR0FBRyxDQUFDLENBQUMsTUFBTSxDQUFDLENBQ1osR0FBRyxDQUFDLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUNoQixTQUFTLENBQUMscUNBQXFDLENBQy9DLE9BQU8sQ0FBQyxNQUFNLENBQ2QsT0FBTyxDQUFDLENBQUMsR0FBRyxFQUFFO1lBQ1osdUJBQXVCO1lBQ3ZCLFNBQVMsQ0FBQyxRQUFRLENBQUMsQ0FBQztRQUN0QixDQUFDLENBQUMsQ0FDRixNQUFNLENBQUMsQ0FBQyxHQUFHLEVBQUU7WUFDWCxvQ0FBb0M7WUFDcEMsMEJBQTBCO1lBQzFCLHdDQUF3QztRQUMxQyxDQUFDLENBQUMsRUFHSjs7UUFBQSxDQUFDLEdBQUcsQ0FBQyxTQUFTLENBQUMsZ0ZBQWdGLENBQzdGO1VBQUEsQ0FBQyxJQUFJLENBQUMsU0FBUyxDQUFDLFdBQVcsQ0FBQyxFQUFFLENBQUMsSUFBSSxDQUFDLE1BQU0sQ0FBQyxFQUFFLElBQUksQ0FDbkQ7UUFBQSxFQUFFLEdBQUcsQ0FDUDtNQUFBLEVBQUUsR0FBRyxDQUVMOztNQUFBLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxLQUFLLENBQ2xCO1FBQUEsQ0FBQyxFQUFFLENBQUMsU0FBUyxDQUFDLHlEQUF5RCxDQUFDLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxFQUFFLEVBQUUsQ0FDeEY7UUFBQSxDQUFDLENBQUMsQ0FBQyxTQUFTLENBQUMsaUNBQWlDLENBQUMsQ0FBQyxJQUFJLENBQUMsTUFBTSxDQUFDLEVBQUUsQ0FBQyxDQUUvRDs7UUFBQSxDQUFDLEdBQUcsQ0FBQyxTQUFTLENBQUMsd0NBQXdDLENBQ3JEO1VBQUEsQ0FBQyxJQUFJLENBQUMsU0FBUyxDQUFDLG9DQUFvQyxDQUFDLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxFQUFFLElBQUksQ0FDdkU7VUFBQSxDQUFDLElBQUksQ0FBQyxTQUFTLENBQUMsc0NBQXNDLENBQUMsQ0FBQyxJQUFJLENBQUMsYUFBYSxDQUFDLEVBQUUsSUFBSSxDQUNuRjtRQUFBLEVBQUUsR0FBRyxDQUVMOztRQUFBLENBQUMsSUFBSSxDQUNILEVBQUUsQ0FBQyxDQUFDLFVBQVUsSUFBSSxDQUFDLEVBQUUsRUFBRSxDQUFDLENBQ3hCLFNBQVMsQ0FBQyx5S0FBeUssQ0FFbkw7O1FBQ0YsRUFBRSxJQUFJLENBQ1I7TUFBQSxFQUFFLEdBQUcsQ0FDUDtJQUFBLEVBQUUsR0FBRyxDQUFDLENBQ1AsQ0FBQztBQUNKLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VFZmZlY3QsIHVzZU1lbW8sIHVzZVN0YXRlIH0gZnJvbSBcInJlYWN0XCI7XG5pbXBvcnQgeyBMaW5rIH0gZnJvbSBcInJlYWN0LXJvdXRlci1kb21cIjtcbmltcG9ydCB0eXBlIHsgQm9vayB9IGZyb20gXCJAL3R5cGVzXCI7XG5cbnR5cGUgUHJvcHMgPSB7XG4gIGJvb2s6IEJvb2s7XG59O1xuXG5jb25zdCBGQUxMQkFDSyA9IFwiL2Jvb2stY292ZXJzL25vLWNvdmVyLmpwZ1wiO1xuXG4vKipcbiAqIGNvdmVySW1hZ2UgbmUgZ2VsaXJzZSBnZWxzaW46XG4gKiAtIGTEscWfIFVSTC9wbGFjZWhvbGRlcifEsSBhc2xhIGt1bGxhbm1hIChvZmZsaW5lIC8gRE5TIHBhdGxhcilcbiAqIC0gXCIvYm9vay1jb3ZlcnMveHh4LmpwZ1wiIHZleWEgXCJ4eHguanBnXCIgdmV5YSBcIiAvYm9vay1jb3ZlcnMveHh4LmpwZyBcIiAtPiBub3JtYWxpemUgZXRcbiAqIC0gYm96dWsga2FyYWt0ZXJsZXJpIHRlbWl6bGUgKHZpcmfDvGwgZ2liaSlcbiAqIC0gZG9zeWEgYWTEsW7EsSBlbmNvZGUgZXQgKHNwYWNlIHZzLiBpw6dpbilcbiAqL1xuZnVuY3Rpb24gbm9ybWFsaXplQ292ZXIoaW5wdXQ/OiBzdHJpbmcgfCBudWxsKSB7XG4gIGlmICghaW5wdXQpIHJldHVybiBGQUxMQkFDSztcblxuICBsZXQgcyA9IFN0cmluZyhpbnB1dCkudHJpbSgpO1xuXG4gIC8vIEJvxZ9zYVxuICBpZiAoIXMpIHJldHVybiBGQUxMQkFDSztcblxuICAvLyBkxLHFnyBwbGFjZWhvbGRlci9kxLHFnyB1cmwgaXN0ZW1peW9ydXpcbiAgaWYgKHMuaW5jbHVkZXMoXCJ2aWEucGxhY2Vob2xkZXIuY29tXCIpKSByZXR1cm4gRkFMTEJBQ0s7XG4gIGlmIChzLnN0YXJ0c1dpdGgoXCJodHRwOi8vXCIpIHx8IHMuc3RhcnRzV2l0aChcImh0dHBzOi8vXCIpKSByZXR1cm4gRkFMTEJBQ0s7XG5cbiAgLy8gXCIvYm9vay1jb3ZlcnMveHh4LmpwZ1wiIGdpYmkgcGF0aCBnZWxkaXlzZSBkb3N5YSBhZMSxbsSxIMOnZWtcbiAgLy8gdmV5YSBcInh4eC5qcGdcIiBnZWxkaXlzZSBvbGR1xJ91IGdpYmkgYWxcbiAgY29uc3QgcHJlZml4ID0gXCIvYm9vay1jb3ZlcnMvXCI7XG4gIGxldCBmaWxlID0gcy5zdGFydHNXaXRoKHByZWZpeCkgPyBzLnNsaWNlKHByZWZpeC5sZW5ndGgpIDogcztcblxuICAvLyBiYXplbiBzYcOnbWEga2FyYWt0ZXJsZXIgZ2VsaXlvcjogXCIsYXRvbWljLWhhYml0cy5qcGdcIiBnaWJpXG4gIC8vIGJhxZ90YWtpL3NvbmRha2kgcHJvYmxlbWxpIGthcmFrdGVybGVyaSB0ZW1pemxlXG4gIGZpbGUgPSBmaWxlLnRyaW0oKS5yZXBsYWNlKC9eLCsvLCBcIlwiKS5yZXBsYWNlKC9cXHMrL2csIFwiIFwiKTtcblxuICAvLyBow6Jsw6IgYm/Fn3NhXG4gIGlmICghZmlsZSkgcmV0dXJuIEZBTExCQUNLO1xuXG4gIC8vIGfDvHZlbmxpIFVSTFxuICByZXR1cm4gYCR7cHJlZml4fSR7ZW5jb2RlVVJJQ29tcG9uZW50KGZpbGUpfWA7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBCb29rQ2FyZCh7IGJvb2sgfTogUHJvcHMpIHtcbiAgY29uc3Qgbm9ybWFsaXplZCA9IHVzZU1lbW8oKCkgPT4gbm9ybWFsaXplQ292ZXIoYm9vay5jb3ZlckltYWdlKSwgW2Jvb2suY292ZXJJbWFnZV0pO1xuICBjb25zdCBbaW1nU3JjLCBzZXRJbWdTcmNdID0gdXNlU3RhdGUobm9ybWFsaXplZCk7XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBzZXRJbWdTcmMobm9ybWFsaXplQ292ZXIoYm9vay5jb3ZlckltYWdlKSk7XG4gIH0sIFtib29rLmNvdmVySW1hZ2VdKTtcblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwiZ2xhc3MtZWZmZWN0IHJvdW5kZWQtMnhsIHNoYWRvdy14bCBib3JkZXIgYm9yZGVyLXdoaXRlLzIwIG92ZXJmbG93LWhpZGRlbiBob3Zlci1nbG93IHRyYW5zaXRpb24tYWxsIGR1cmF0aW9uLTMwMFwiPlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJyZWxhdGl2ZVwiPlxuICAgICAgICA8aW1nXG4gICAgICAgICAgc3JjPXtpbWdTcmN9XG4gICAgICAgICAgYWx0PXtib29rLnRpdGxlfVxuICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbCBoLVs0MjBweF0gb2JqZWN0LWNvdmVyIGJsb2NrXCJcbiAgICAgICAgICBsb2FkaW5nPVwibGF6eVwiXG4gICAgICAgICAgb25FcnJvcj17KCkgPT4ge1xuICAgICAgICAgICAgLy8gYnVyYWRhIGZhbGxiYWNrJ2UgYWxcbiAgICAgICAgICAgIHNldEltZ1NyYyhGQUxMQkFDSyk7XG4gICAgICAgICAgfX1cbiAgICAgICAgICBvbkxvYWQ9eygpID0+IHtcbiAgICAgICAgICAgIC8vIGRlYnVnOiBkb8SfcnUgcGF0aCBtaSB5w7xrbGVuZGkgZ8O2clxuICAgICAgICAgICAgLy8gacWfIGJpdGluY2Ugc2lsZWJpbGlyc2luXG4gICAgICAgICAgICAvLyBjb25zb2xlLmxvZyhcIkxvYWRlZCBjb3ZlcjpcIiwgaW1nU3JjKTtcbiAgICAgICAgICB9fVxuICAgICAgICAvPlxuXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYWJzb2x1dGUgdG9wLTQgcmlnaHQtNCBiZy13aGl0ZS85MCBiYWNrZHJvcC1ibHVyIHB4LTMgcHktMS41IHJvdW5kZWQteGwgc2hhZG93XCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1ib2xkXCI+4q2QIHtib29rLnJhdGluZ308L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC02XCI+XG4gICAgICAgIDxoMyBjbGFzc05hbWU9XCJ0ZXh0LXhsIGZvbnQtZXh0cmFib2xkIHRleHQtc2xhdGUtOTAwIG1iLTEgbGluZS1jbGFtcC0yXCI+e2Jvb2sudGl0bGV9PC9oMz5cbiAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbGF0ZS02MDAgZm9udC1tZWRpdW0gbWItNFwiPntib29rLmF1dGhvcn08L3A+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gbWItNVwiPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImJhZGdlLWdyYWRpZW50IHB4LTMgcHktMS41IHRleHQtc21cIj57Ym9vay5nZW5yZX08L3NwYW4+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1zbGF0ZS01MDAgdGV4dC1zbSBmb250LXNlbWlib2xkXCI+e2Jvb2sucHVibGlzaGVkWWVhcn08L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIDxMaW5rXG4gICAgICAgICAgdG89e2AvYm9va3MvJHtib29rLmlkfWB9XG4gICAgICAgICAgY2xhc3NOYW1lPVwidy1mdWxsIGlubGluZS1mbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciByb3VuZGVkLXhsIHB4LTQgcHktMyBmb250LWJvbGQgYmctd2hpdGUgYm9yZGVyIGJvcmRlci1zbGF0ZS0yMDAgaG92ZXI6Ym9yZGVyLXZpb2xldC0zMDAgaG92ZXI6dGV4dC12aW9sZXQtNzAwIHRyYW5zaXRpb25cIlxuICAgICAgICA+XG4gICAgICAgICAgVmlldyBEZXRhaWxzXG4gICAgICAgIDwvTGluaz5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufSJdfQ==

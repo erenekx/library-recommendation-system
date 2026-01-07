@@ -1,35 +1,27 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Card } from '@/components/common/Card';
-
 describe('Card Component', () => {
-  it('renders children content', () => {
-    render(
-      <Card>
+    it('renders children content', () => {
+        render(<Card>
         <h3>Card Title</h3>
         <p>Card content</p>
-      </Card>
-    );
-
-    expect(screen.getByText('Card Title')).toBeInTheDocument();
-    expect(screen.getByText('Card content')).toBeInTheDocument();
-  });
-
-  it('calls onClick when hoverable card is clicked', () => {
-    const handleClick = vi.fn();
-    render(
-      <Card hoverable onClick={handleClick}>
+      </Card>);
+        expect(screen.getByText('Card Title')).toBeInTheDocument();
+        expect(screen.getByText('Card content')).toBeInTheDocument();
+    });
+    it('calls onClick when hoverable card is clicked', () => {
+        const handleClick = vi.fn();
+        render(<Card hoverable onClick={handleClick}>
         Click me
-      </Card>
-    );
-
-    fireEvent.click(screen.getByText('Click me'));
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('applies hover classes when hoverable prop is true', () => {
-    const { container } = render(<Card hoverable>Hoverable</Card>);
-    const card = container.firstChild as HTMLElement;
-    expect(card).toHaveClass('hover:shadow-lg');
-  });
+      </Card>);
+        fireEvent.click(screen.getByText('Click me'));
+        expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+    it('applies hover classes when hoverable prop is true', () => {
+        const { container } = render(<Card hoverable>Hoverable</Card>);
+        const card = container.firstChild;
+        expect(card).toHaveClass('hover:shadow-lg');
+    });
 });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQ2FyZC50ZXN0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiQ2FyZC50ZXN0LnRzeCJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQUUsUUFBUSxFQUFFLEVBQUUsRUFBRSxNQUFNLEVBQUUsRUFBRSxFQUFFLE1BQU0sUUFBUSxDQUFDO0FBQ2xELE9BQU8sRUFBRSxNQUFNLEVBQUUsTUFBTSxFQUFFLFNBQVMsRUFBRSxNQUFNLHdCQUF3QixDQUFDO0FBQ25FLE9BQU8sRUFBRSxJQUFJLEVBQUUsTUFBTSwwQkFBMEIsQ0FBQztBQUVoRCxRQUFRLENBQUMsZ0JBQWdCLEVBQUUsR0FBRyxFQUFFO0lBQzlCLEVBQUUsQ0FBQywwQkFBMEIsRUFBRSxHQUFHLEVBQUU7UUFDbEMsTUFBTSxDQUNKLENBQUMsSUFBSSxDQUNIO1FBQUEsQ0FBQyxFQUFFLENBQUMsVUFBVSxFQUFFLEVBQUUsQ0FDbEI7UUFBQSxDQUFDLENBQUMsQ0FBQyxZQUFZLEVBQUUsQ0FBQyxDQUNwQjtNQUFBLEVBQUUsSUFBSSxDQUFDLENBQ1IsQ0FBQztRQUVGLE1BQU0sQ0FBQyxNQUFNLENBQUMsU0FBUyxDQUFDLFlBQVksQ0FBQyxDQUFDLENBQUMsaUJBQWlCLEVBQUUsQ0FBQztRQUMzRCxNQUFNLENBQUMsTUFBTSxDQUFDLFNBQVMsQ0FBQyxjQUFjLENBQUMsQ0FBQyxDQUFDLGlCQUFpQixFQUFFLENBQUM7SUFDL0QsQ0FBQyxDQUFDLENBQUM7SUFFSCxFQUFFLENBQUMsOENBQThDLEVBQUUsR0FBRyxFQUFFO1FBQ3RELE1BQU0sV0FBVyxHQUFHLEVBQUUsQ0FBQyxFQUFFLEVBQUUsQ0FBQztRQUM1QixNQUFNLENBQ0osQ0FBQyxJQUFJLENBQUMsU0FBUyxDQUFDLE9BQU8sQ0FBQyxDQUFDLFdBQVcsQ0FBQyxDQUNuQzs7TUFDRixFQUFFLElBQUksQ0FBQyxDQUNSLENBQUM7UUFFRixTQUFTLENBQUMsS0FBSyxDQUFDLE1BQU0sQ0FBQyxTQUFTLENBQUMsVUFBVSxDQUFDLENBQUMsQ0FBQztRQUM5QyxNQUFNLENBQUMsV0FBVyxDQUFDLENBQUMscUJBQXFCLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDL0MsQ0FBQyxDQUFDLENBQUM7SUFFSCxFQUFFLENBQUMsbURBQW1ELEVBQUUsR0FBRyxFQUFFO1FBQzNELE1BQU0sRUFBRSxTQUFTLEVBQUUsR0FBRyxNQUFNLENBQUMsQ0FBQyxJQUFJLENBQUMsU0FBUyxDQUFDLFNBQVMsRUFBRSxJQUFJLENBQUMsQ0FBQyxDQUFDO1FBQy9ELE1BQU0sSUFBSSxHQUFHLFNBQVMsQ0FBQyxVQUF5QixDQUFDO1FBQ2pELE1BQU0sQ0FBQyxJQUFJLENBQUMsQ0FBQyxXQUFXLENBQUMsaUJBQWlCLENBQUMsQ0FBQztJQUM5QyxDQUFDLENBQUMsQ0FBQztBQUNMLENBQUMsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgZGVzY3JpYmUsIGl0LCBleHBlY3QsIHZpIH0gZnJvbSAndml0ZXN0JztcbmltcG9ydCB7IHJlbmRlciwgc2NyZWVuLCBmaXJlRXZlbnQgfSBmcm9tICdAdGVzdGluZy1saWJyYXJ5L3JlYWN0JztcbmltcG9ydCB7IENhcmQgfSBmcm9tICdAL2NvbXBvbmVudHMvY29tbW9uL0NhcmQnO1xuXG5kZXNjcmliZSgnQ2FyZCBDb21wb25lbnQnLCAoKSA9PiB7XG4gIGl0KCdyZW5kZXJzIGNoaWxkcmVuIGNvbnRlbnQnLCAoKSA9PiB7XG4gICAgcmVuZGVyKFxuICAgICAgPENhcmQ+XG4gICAgICAgIDxoMz5DYXJkIFRpdGxlPC9oMz5cbiAgICAgICAgPHA+Q2FyZCBjb250ZW50PC9wPlxuICAgICAgPC9DYXJkPlxuICAgICk7XG5cbiAgICBleHBlY3Qoc2NyZWVuLmdldEJ5VGV4dCgnQ2FyZCBUaXRsZScpKS50b0JlSW5UaGVEb2N1bWVudCgpO1xuICAgIGV4cGVjdChzY3JlZW4uZ2V0QnlUZXh0KCdDYXJkIGNvbnRlbnQnKSkudG9CZUluVGhlRG9jdW1lbnQoKTtcbiAgfSk7XG5cbiAgaXQoJ2NhbGxzIG9uQ2xpY2sgd2hlbiBob3ZlcmFibGUgY2FyZCBpcyBjbGlja2VkJywgKCkgPT4ge1xuICAgIGNvbnN0IGhhbmRsZUNsaWNrID0gdmkuZm4oKTtcbiAgICByZW5kZXIoXG4gICAgICA8Q2FyZCBob3ZlcmFibGUgb25DbGljaz17aGFuZGxlQ2xpY2t9PlxuICAgICAgICBDbGljayBtZVxuICAgICAgPC9DYXJkPlxuICAgICk7XG5cbiAgICBmaXJlRXZlbnQuY2xpY2soc2NyZWVuLmdldEJ5VGV4dCgnQ2xpY2sgbWUnKSk7XG4gICAgZXhwZWN0KGhhbmRsZUNsaWNrKS50b0hhdmVCZWVuQ2FsbGVkVGltZXMoMSk7XG4gIH0pO1xuXG4gIGl0KCdhcHBsaWVzIGhvdmVyIGNsYXNzZXMgd2hlbiBob3ZlcmFibGUgcHJvcCBpcyB0cnVlJywgKCkgPT4ge1xuICAgIGNvbnN0IHsgY29udGFpbmVyIH0gPSByZW5kZXIoPENhcmQgaG92ZXJhYmxlPkhvdmVyYWJsZTwvQ2FyZD4pO1xuICAgIGNvbnN0IGNhcmQgPSBjb250YWluZXIuZmlyc3RDaGlsZCBhcyBIVE1MRWxlbWVudDtcbiAgICBleHBlY3QoY2FyZCkudG9IYXZlQ2xhc3MoJ2hvdmVyOnNoYWRvdy1sZycpO1xuICB9KTtcbn0pO1xuIl19

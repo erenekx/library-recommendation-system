@@ -1,13 +1,4 @@
 import React from 'react';
-
-/**
- * Input component props
- */
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  error?: string;
-}
-
 /**
  * Modern Input component with beautiful focus states
  *
@@ -21,30 +12,20 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
  *   required
  * />
  */
-export function Input({ label, error, required, className = '', ...props }: InputProps) {
-  const inputClasses = `input-modern ${
-    error ? 'border-rose-500 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/10' : ''
-  } ${className}`;
-
-  return (
-    <div className="mb-5">
+export function Input({ label, error, required, className = '', ...props }) {
+    const inputClasses = `input-modern ${error ? 'border-rose-500 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/10' : ''} ${className}`;
+    return (<div className="mb-5">
       <label className="block text-sm font-semibold text-slate-700 mb-2">
         {label}
         {required && <span className="text-rose-500 ml-1">*</span>}
       </label>
-      <input className={inputClasses} {...props} />
-      {error && (
-        <div className="mt-2 flex items-center text-sm text-rose-600">
+      <input className={inputClasses} {...props}/>
+      {error && (<div className="mt-2 flex items-center text-sm text-rose-600">
           <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd"
-            />
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
           </svg>
           {error}
-        </div>
-      )}
-    </div>
-  );
+        </div>)}
+    </div>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSW5wdXQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJJbnB1dC50c3giXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxLQUFLLE1BQU0sT0FBTyxDQUFDO0FBVTFCOzs7Ozs7Ozs7Ozs7R0FZRztBQUNILE1BQU0sVUFBVSxLQUFLLENBQUMsRUFBRSxLQUFLLEVBQUUsS0FBSyxFQUFFLFFBQVEsRUFBRSxTQUFTLEdBQUcsRUFBRSxFQUFFLEdBQUcsS0FBSyxFQUFjO0lBQ3BGLE1BQU0sWUFBWSxHQUFHLGdCQUNuQixLQUFLLENBQUMsQ0FBQyxDQUFDLHlFQUF5RSxDQUFDLENBQUMsQ0FBQyxFQUN0RixJQUFJLFNBQVMsRUFBRSxDQUFDO0lBRWhCLE9BQU8sQ0FDTCxDQUFDLEdBQUcsQ0FBQyxTQUFTLENBQUMsTUFBTSxDQUNuQjtNQUFBLENBQUMsS0FBSyxDQUFDLFNBQVMsQ0FBQyxpREFBaUQsQ0FDaEU7UUFBQSxDQUFDLEtBQUssQ0FDTjtRQUFBLENBQUMsUUFBUSxJQUFJLENBQUMsSUFBSSxDQUFDLFNBQVMsQ0FBQyxvQkFBb0IsQ0FBQyxDQUFDLEVBQUUsSUFBSSxDQUFDLENBQzVEO01BQUEsRUFBRSxLQUFLLENBQ1A7TUFBQSxDQUFDLEtBQUssQ0FBQyxTQUFTLENBQUMsQ0FBQyxZQUFZLENBQUMsQ0FBQyxJQUFJLEtBQUssQ0FBQyxFQUMxQztNQUFBLENBQUMsS0FBSyxJQUFJLENBQ1IsQ0FBQyxHQUFHLENBQUMsU0FBUyxDQUFDLDhDQUE4QyxDQUMzRDtVQUFBLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxjQUFjLENBQUMsSUFBSSxDQUFDLGNBQWMsQ0FBQyxPQUFPLENBQUMsV0FBVyxDQUNuRTtZQUFBLENBQUMsSUFBSSxDQUNILFFBQVEsQ0FBQyxTQUFTLENBQ2xCLENBQUMsQ0FBQyxtSEFBbUgsQ0FDckgsUUFBUSxDQUFDLFNBQVMsRUFFdEI7VUFBQSxFQUFFLEdBQUcsQ0FDTDtVQUFBLENBQUMsS0FBSyxDQUNSO1FBQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUNIO0lBQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5cbi8qKlxuICogSW5wdXQgY29tcG9uZW50IHByb3BzXG4gKi9cbmludGVyZmFjZSBJbnB1dFByb3BzIGV4dGVuZHMgUmVhY3QuSW5wdXRIVE1MQXR0cmlidXRlczxIVE1MSW5wdXRFbGVtZW50PiB7XG4gIGxhYmVsOiBzdHJpbmc7XG4gIGVycm9yPzogc3RyaW5nO1xufVxuXG4vKipcbiAqIE1vZGVybiBJbnB1dCBjb21wb25lbnQgd2l0aCBiZWF1dGlmdWwgZm9jdXMgc3RhdGVzXG4gKlxuICogQGV4YW1wbGVcbiAqIDxJbnB1dFxuICogICBsYWJlbD1cIkVtYWlsXCJcbiAqICAgdHlwZT1cImVtYWlsXCJcbiAqICAgdmFsdWU9e2VtYWlsfVxuICogICBvbkNoYW5nZT17KGUpID0+IHNldEVtYWlsKGUudGFyZ2V0LnZhbHVlKX1cbiAqICAgZXJyb3I9e2VtYWlsRXJyb3J9XG4gKiAgIHJlcXVpcmVkXG4gKiAvPlxuICovXG5leHBvcnQgZnVuY3Rpb24gSW5wdXQoeyBsYWJlbCwgZXJyb3IsIHJlcXVpcmVkLCBjbGFzc05hbWUgPSAnJywgLi4ucHJvcHMgfTogSW5wdXRQcm9wcykge1xuICBjb25zdCBpbnB1dENsYXNzZXMgPSBgaW5wdXQtbW9kZXJuICR7XG4gICAgZXJyb3IgPyAnYm9yZGVyLXJvc2UtNTAwIGJnLXJvc2UtNTAgZm9jdXM6Ym9yZGVyLXJvc2UtNTAwIGZvY3VzOnJpbmctcm9zZS01MDAvMTAnIDogJydcbiAgfSAke2NsYXNzTmFtZX1gO1xuXG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJtYi01XCI+XG4gICAgICA8bGFiZWwgY2xhc3NOYW1lPVwiYmxvY2sgdGV4dC1zbSBmb250LXNlbWlib2xkIHRleHQtc2xhdGUtNzAwIG1iLTJcIj5cbiAgICAgICAge2xhYmVsfVxuICAgICAgICB7cmVxdWlyZWQgJiYgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1yb3NlLTUwMCBtbC0xXCI+Kjwvc3Bhbj59XG4gICAgICA8L2xhYmVsPlxuICAgICAgPGlucHV0IGNsYXNzTmFtZT17aW5wdXRDbGFzc2VzfSB7Li4ucHJvcHN9IC8+XG4gICAgICB7ZXJyb3IgJiYgKFxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm10LTIgZmxleCBpdGVtcy1jZW50ZXIgdGV4dC1zbSB0ZXh0LXJvc2UtNjAwXCI+XG4gICAgICAgICAgPHN2ZyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTFcIiBmaWxsPVwiY3VycmVudENvbG9yXCIgdmlld0JveD1cIjAgMCAyMCAyMFwiPlxuICAgICAgICAgICAgPHBhdGhcbiAgICAgICAgICAgICAgZmlsbFJ1bGU9XCJldmVub2RkXCJcbiAgICAgICAgICAgICAgZD1cIk0xOCAxMGE4IDggMCAxMS0xNiAwIDggOCAwIDAxMTYgMHptLTcgNGExIDEgMCAxMS0yIDAgMSAxIDAgMDEyIDB6bS0xLTlhMSAxIDAgMDAtMSAxdjRhMSAxIDAgMTAyIDBWNmExIDEgMCAwMC0xLTF6XCJcbiAgICAgICAgICAgICAgY2xpcFJ1bGU9XCJldmVub2RkXCJcbiAgICAgICAgICAgIC8+XG4gICAgICAgICAgPC9zdmc+XG4gICAgICAgICAge2Vycm9yfVxuICAgICAgICA8L2Rpdj5cbiAgICAgICl9XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXX0=

@@ -1,218 +1,89 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/common/Button';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { getBook } from '@/services/api';
-import { Book } from '@/types';
-import { formatRating } from '@/utils/formatters';
-import { handleApiError } from '@/utils/errorHandling';
-
-/**
- * BookDetail page component
- */
-export function BookDetail() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [book, setBook] = useState<Book | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (id) {
-      loadBook(id);
+// src/pages/BookDetail.tsx
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { getBook } from "@/services/api";
+function BookDetail() {
+    const { id } = useParams();
+    const [book, setBook] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    useEffect(() => {
+        let mounted = true;
+        async function run() {
+            try {
+                setLoading(true);
+                setError("");
+                if (!id) {
+                    setBook(null);
+                    setError("Book id is missing");
+                    return;
+                }
+                const b = await getBook(id);
+                if (mounted)
+                    setBook(b);
+            }
+            catch (e) {
+                if (mounted)
+                    setError(e?.message ?? "Failed to load book");
+            }
+            finally {
+                if (mounted)
+                    setLoading(false);
+            }
+        }
+        run();
+        return () => {
+            mounted = false;
+        };
+    }, [id]);
+    if (loading)
+        return <div className="p-8">Loading...</div>;
+    if (error) {
+        return (<div className="p-8">
+        <div className="mb-4 text-red-600 font-semibold">{error}</div>
+        <Link className="underline" to="/books">
+          Back to Books
+        </Link>
+      </div>);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const loadBook = async (bookId: string) => {
-    setIsLoading(true);
-    try {
-      const data = await getBook(bookId);
-      if (!data) {
-        navigate('/404');
-        return;
-      }
-      setBook(data);
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsLoading(false);
+    if (!book) {
+        return (<div className="p-8">
+        <div className="mb-4 font-semibold">Book not found</div>
+        <Link className="underline" to="/books">
+          Back to Books
+        </Link>
+      </div>);
     }
-  };
+    return (<div className="p-8 max-w-5xl mx-auto">
+      <Link to="/books" className="underline">
+        ← Back to Books
+      </Link>
 
-  // TODO: Implement add to reading list functionality
-  const handleAddToList = () => {
-    alert('Add to reading list functionality coming soon!');
-  };
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="rounded-2xl overflow-hidden border border-slate-200">
+          <img src={book.coverImage} alt={book.title} className="w-full h-[520px] object-cover" onError={(e) => {
+            e.currentTarget.src = "/book-covers/no-cover.jpg";
+        }}/>
+        </div>
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
+        <div>
+          <h1 className="text-3xl font-extrabold">{book.title}</h1>
+          <p className="mt-2 text-slate-600 font-medium">{book.author}</p>
 
-  if (!book) {
-    return null;
-  }
-
-  return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="container mx-auto max-w-6xl">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-slate-600 hover:text-violet-600 mb-8 transition-colors group glass-effect px-4 py-2 rounded-xl border border-white/20 w-fit"
-        >
-          <svg
-            className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          <span className="font-semibold">Back</span>
-        </button>
-
-        <div className="glass-effect rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 md:p-12">
-            <div className="md:col-span-1">
-              <div className="relative group">
-                <img
-                  src={book.coverImage}
-                  alt={book.title}
-                  className="w-full rounded-2xl shadow-2xl group-hover:shadow-glow transition-all duration-300"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/300x400?text=No+Cover';
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-violet-900/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              </div>
+          <div className="mt-6 space-y-2">
+            <div>
+              <span className="font-semibold">Genre:</span> {book.genre}
             </div>
-
-            <div className="md:col-span-2">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-3 leading-tight">
-                {book.title}
-              </h1>
-              <p className="text-xl text-slate-600 mb-6 font-medium">by {book.author}</p>
-
-              <div className="flex flex-wrap items-center gap-4 mb-8">
-                <div className="flex items-center bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-2 rounded-xl border border-amber-200 shadow-sm">
-                  <svg
-                    className="w-5 h-5 text-amber-500 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                  <span className="text-lg font-bold text-amber-700">
-                    {formatRating(book.rating)}
-                  </span>
-                </div>
-
-                <span className="badge-gradient px-4 py-2 text-sm">{book.genre}</span>
-
-                <div className="flex items-center text-slate-600 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span className="font-semibold">{book.publishedYear}</span>
-                </div>
-              </div>
-
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
-                  <span className="w-1 h-6 bg-gradient-to-b from-violet-600 to-indigo-600 rounded-full mr-3"></span>
-                  Description
-                </h2>
-                <p className="text-slate-700 leading-relaxed text-lg">{book.description}</p>
-              </div>
-
-              <div className="mb-8 glass-effect p-4 rounded-xl border border-white/20">
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold">ISBN:</span> {book.isbn}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Button variant="primary" size="lg" onClick={handleAddToList}>
-                  <svg
-                    className="w-5 h-5 mr-2 inline"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Add to Reading List
-                </Button>
-                <Button variant="outline" size="lg">
-                  <svg
-                    className="w-5 h-5 mr-2 inline"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  Write a Review
-                </Button>
-              </div>
+            <div>
+              <span className="font-semibold">Year:</span> {book.publishedYear}
+            </div>
+            <div>
+              <span className="font-semibold">Rating:</span> {book.rating}
             </div>
           </div>
         </div>
-
-        {/* TODO: Implement reviews section */}
-        <div className="mt-8 glass-effect rounded-3xl shadow-xl border border-white/20 p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-slate-900 mb-6 flex items-center">
-            <span className="w-1 h-8 bg-gradient-to-b from-violet-600 to-indigo-600 rounded-full mr-3"></span>
-            Reviews
-          </h2>
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-br from-violet-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-violet-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                />
-              </svg>
-            </div>
-            <p className="text-slate-600 text-lg">Reviews section coming soon...</p>
-          </div>
-        </div>
       </div>
-    </div>
-  );
+    </div>);
 }
+export default BookDetail;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQm9va0RldGFpbC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIkJvb2tEZXRhaWwudHN4Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLDJCQUEyQjtBQUMzQixPQUFPLEVBQUUsU0FBUyxFQUFFLFFBQVEsRUFBRSxNQUFNLE9BQU8sQ0FBQztBQUM1QyxPQUFPLEVBQUUsU0FBUyxFQUFFLElBQUksRUFBRSxNQUFNLGtCQUFrQixDQUFDO0FBRW5ELE9BQU8sRUFBRSxPQUFPLEVBQUUsTUFBTSxnQkFBZ0IsQ0FBQztBQUV6QyxTQUFTLFVBQVU7SUFDakIsTUFBTSxFQUFFLEVBQUUsRUFBRSxHQUFHLFNBQVMsRUFBa0IsQ0FBQztJQUMzQyxNQUFNLENBQUMsSUFBSSxFQUFFLE9BQU8sQ0FBQyxHQUFHLFFBQVEsQ0FBYyxJQUFJLENBQUMsQ0FBQztJQUNwRCxNQUFNLENBQUMsT0FBTyxFQUFFLFVBQVUsQ0FBQyxHQUFHLFFBQVEsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUM3QyxNQUFNLENBQUMsS0FBSyxFQUFFLFFBQVEsQ0FBQyxHQUFHLFFBQVEsQ0FBUyxFQUFFLENBQUMsQ0FBQztJQUUvQyxTQUFTLENBQUMsR0FBRyxFQUFFO1FBQ2IsSUFBSSxPQUFPLEdBQUcsSUFBSSxDQUFDO1FBRW5CLEtBQUssVUFBVSxHQUFHO1lBQ2hCLElBQUksQ0FBQztnQkFDSCxVQUFVLENBQUMsSUFBSSxDQUFDLENBQUM7Z0JBQ2pCLFFBQVEsQ0FBQyxFQUFFLENBQUMsQ0FBQztnQkFFYixJQUFJLENBQUMsRUFBRSxFQUFFLENBQUM7b0JBQ1IsT0FBTyxDQUFDLElBQUksQ0FBQyxDQUFDO29CQUNkLFFBQVEsQ0FBQyxvQkFBb0IsQ0FBQyxDQUFDO29CQUMvQixPQUFPO2dCQUNULENBQUM7Z0JBRUQsTUFBTSxDQUFDLEdBQUcsTUFBTSxPQUFPLENBQUMsRUFBRSxDQUFDLENBQUM7Z0JBQzVCLElBQUksT0FBTztvQkFBRSxPQUFPLENBQUMsQ0FBQyxDQUFDLENBQUM7WUFD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QUFJLENBQUMsU0FBUyxDQUFDLGVBQWUsQ0FBQyxLQUFLLEVBQUUsSUFBSSxDQUFFLENBQUEsQ0FBQyxJQUFJLENBQUMsYUFBYSxDQUNsRTtZQUFBLEVBQUUsR0FBRyxDQUNMO1lBQUEsQ0FBQyxHQUFHLENBQ0Y7Y0FBQSxDQUFDLElBQUksQ0FBQyxTQUFTLENBQUMsZUFBZSxDQUFDLE9BQU8sRUFBRSxJQUFJLENBQUUsQ0FBQSxDQUFDLElBQUksQ0FBQyxNQUFNLENBQzdEO1lBQUEsRUFBRSxHQUFHLENBQ1A7VUFBQSxFQUFFLEdBQUcsQ0FDUDtRQUFBLEVBQUUsR0FBRyxDQUNQO01BQUEsRUFBRSxHQUFHLENBQ1A7SUFBQSxFQUFFLEdBQUcsQ0FBQyxDQUNQLENBQUM7QUFDSixDQUFDO0FBRUQsZUFBZSxVQUFVLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvLyBzcmMvcGFnZXMvQm9va0RldGFpbC50c3hcbmltcG9ydCB7IHVzZUVmZmVjdCwgdXNlU3RhdGUgfSBmcm9tIFwicmVhY3RcIjtcbmltcG9ydCB7IHVzZVBhcmFtcywgTGluayB9IGZyb20gXCJyZWFjdC1yb3V0ZXItZG9tXCI7XG5pbXBvcnQgdHlwZSB7IEJvb2sgfSBmcm9tIFwiQC90eXBlc1wiO1xuaW1wb3J0IHsgZ2V0Qm9vayB9IGZyb20gXCJAL3NlcnZpY2VzL2FwaVwiO1xuXG5mdW5jdGlvbiBCb29rRGV0YWlsKCkge1xuICBjb25zdCB7IGlkIH0gPSB1c2VQYXJhbXM8eyBpZDogc3RyaW5nIH0+KCk7XG4gIGNvbnN0IFtib29rLCBzZXRCb29rXSA9IHVzZVN0YXRlPEJvb2sgfCBudWxsPihudWxsKTtcbiAgY29uc3QgW2xvYWRpbmcsIHNldExvYWRpbmddID0gdXNlU3RhdGUodHJ1ZSk7XG4gIGNvbnN0IFtlcnJvciwgc2V0RXJyb3JdID0gdXNlU3RhdGU8c3RyaW5nPihcIlwiKTtcblxuICB1c2VFZmZlY3QoKCkgPT4ge1xuICAgIGxldCBtb3VudGVkID0gdHJ1ZTtcblxuICAgIGFzeW5jIGZ1bmN0aW9uIHJ1bigpIHtcbiAgICAgIHRyeSB7XG4gICAgICAgIHNldExvYWRpbmcodHJ1ZSk7XG4gICAgICAgIHNldEVycm9yKFwiXCIpO1xuXG4gICAgICAgIGlmICghaWQpIHtcbiAgICAgICAgICBzZXRCb29rKG51bGwpO1xuICAgICAgICAgIHNldEVycm9yKFwiQm9vayBpZCBpcyBtaXNzaW5nXCIpO1xuICAgICAgICAgIHJldHVybjtcbiAgICAgICAgfVxuXG4gICAgICAgIGNvbnN0IGIgPSBhd2FpdCBnZXRCb29rKGlkKTtcbiAgICAgICAgaWYgKG1vdW50ZWQpIHNldEJvb2soYik7XG4gICAgICB9IGNhdGNoIChlOiBhbnkpIHtcbiAgICAgICAgaWYgKG1vdW50ZWQpIHNldEVycm9yKGU/Lm1lc3NhZ2UgPz8gXCJGYWlsZWQgdG8gbG9hZCBib29rXCIpO1xuICAgICAgfSBmaW5hbGx5IHtcbiAgICAgICAgaWYgKG1vdW50ZWQpIHNldExvYWRpbmcoZmFsc2UpO1xuICAgICAgfVxuICAgIH1cblxuICAgIHJ1bigpO1xuXG4gICAgcmV0dXJuICgpID0+IHtcbiAgICAgIG1vdW50ZWQgPSBmYWxzZTtcbiAgICB9O1xuICB9LCBbaWRdKTtcblxuICBpZiAobG9hZGluZykgcmV0dXJuIDxkaXYgY2xhc3NOYW1lPVwicC04XCI+TG9hZGluZy4uLjwvZGl2PjtcblxuICBpZiAoZXJyb3IpIHtcbiAgICByZXR1cm4gKFxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLThcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtYi00IHRleHQtcmVkLTYwMCBmb250LXNlbWlib2xkXCI+e2Vycm9yfTwvZGl2PlxuICAgICAgICA8TGluayBjbGFzc05hbWU9XCJ1bmRlcmxpbmVcIiB0bz1cIi9ib29rc1wiPlxuICAgICAgICAgIEJhY2sgdG8gQm9va3NcbiAgICAgICAgPC9MaW5rPlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIGlmICghYm9vaykge1xuICAgIHJldHVybiAoXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtOFwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1iLTQgZm9udC1zZW1pYm9sZFwiPkJvb2sgbm90IGZvdW5kPC9kaXY+XG4gICAgICAgIDxMaW5rIGNsYXNzTmFtZT1cInVuZGVybGluZVwiIHRvPVwiL2Jvb2tzXCI+XG4gICAgICAgICAgQmFjayB0byBCb29rc1xuICAgICAgICA8L0xpbms+XG4gICAgICA8L2Rpdj5cbiAgICApO1xuICB9XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cInAtOCBtYXgtdy01eGwgbXgtYXV0b1wiPlxuICAgICAgPExpbmsgdG89XCIvYm9va3NcIiBjbGFzc05hbWU9XCJ1bmRlcmxpbmVcIj5cbiAgICAgICAg4oaQIEJhY2sgdG8gQm9va3NcbiAgICAgIDwvTGluaz5cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJtdC02IGdyaWQgZ3JpZC1jb2xzLTEgbWQ6Z3JpZC1jb2xzLTIgZ2FwLThcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyb3VuZGVkLTJ4bCBvdmVyZmxvdy1oaWRkZW4gYm9yZGVyIGJvcmRlci1zbGF0ZS0yMDBcIj5cbiAgICAgICAgICA8aW1nXG4gICAgICAgICAgICBzcmM9e2Jvb2suY292ZXJJbWFnZX1cbiAgICAgICAgICAgIGFsdD17Ym9vay50aXRsZX1cbiAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbCBoLVs1MjBweF0gb2JqZWN0LWNvdmVyXCJcbiAgICAgICAgICAgIG9uRXJyb3I9eyhlKSA9PiB7XG4gICAgICAgICAgICAgIGUuY3VycmVudFRhcmdldC5zcmMgPSBcIi9ib29rLWNvdmVycy9uby1jb3Zlci5qcGdcIjtcbiAgICAgICAgICAgIH19XG4gICAgICAgICAgLz5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8aDEgY2xhc3NOYW1lPVwidGV4dC0zeGwgZm9udC1leHRyYWJvbGRcIj57Ym9vay50aXRsZX08L2gxPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cIm10LTIgdGV4dC1zbGF0ZS02MDAgZm9udC1tZWRpdW1cIj57Ym9vay5hdXRob3J9PC9wPlxuXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtdC02IHNwYWNlLXktMlwiPlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPkdlbnJlOjwvc3Bhbj4ge2Jvb2suZ2VucmV9XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj5ZZWFyOjwvc3Bhbj4ge2Jvb2sucHVibGlzaGVkWWVhcn1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPlJhdGluZzo8L3NwYW4+IHtib29rLnJhdGluZ31cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufVxuXG5leHBvcnQgZGVmYXVsdCBCb29rRGV0YWlsOyJdfQ==

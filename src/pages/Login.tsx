@@ -1,34 +1,31 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Input } from '@/components/common/Input';
-import { Button } from '@/components/common/Button';
-import { useAuth } from '@/hooks/useAuth';
-import { validateEmail, validateRequired } from '@/utils/validation';
-import { handleApiError } from '@/utils/errorHandling';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Input } from "@/components/common/Input";
+import { Button } from "@/components/common/Button";
+import { useAuth } from "@/hooks/useAuth";
+import { validateEmail, validateRequired } from "@/utils/validation";
+import { handleApiError } from "@/utils/errorHandling";
 
-/**
- * Login page component
- */
 export function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { login, user, isAuthLoading } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const validate = (): boolean => {
+  useEffect(() => {
+    if (!isAuthLoading && user) navigate("/", { replace: true });
+  }, [isAuthLoading, user, navigate]);
+
+  const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
 
-    if (!validateRequired(email)) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Invalid email format';
-    }
+    if (!validateRequired(email)) newErrors.email = "Email is required";
+    else if (!validateEmail(email)) newErrors.email = "Invalid email format";
 
-    if (!validateRequired(password)) {
-      newErrors.password = 'Password is required';
-    }
+    if (!validateRequired(password)) newErrors.password = "Password is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -36,15 +33,12 @@ export function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
 
     setIsLoading(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate("/", { replace: true });
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -58,12 +52,7 @@ export function Login() {
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30 mx-auto">
-              <svg
-                className="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -73,6 +62,7 @@ export function Login() {
               </svg>
             </div>
           </div>
+
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
             <span className="gradient-text">Welcome Back</span>
           </h1>
@@ -103,36 +93,25 @@ export function Login() {
 
             <div className="flex items-center justify-between mb-6">
               <label className="flex items-center cursor-pointer group">
-                <input
-                  type="checkbox"
-                  className="mr-2 w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
-                />
+                <input type="checkbox" className="mr-2 w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
                 <span className="text-sm text-slate-600 group-hover:text-slate-900 font-medium">
                   Remember me
                 </span>
               </label>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-violet-600 hover:text-violet-700 font-semibold"
-              >
+
+              <Link to="/forgot-password" className="text-sm text-violet-600 hover:text-violet-700 font-semibold">
                 Forgot password?
               </Link>
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading || isAuthLoading}>
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{" "}
               <Link to="/signup" className="text-violet-600 hover:text-violet-700 font-semibold">
                 Sign up
               </Link>

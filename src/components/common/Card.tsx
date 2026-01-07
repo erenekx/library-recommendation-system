@@ -1,16 +1,4 @@
 import React from 'react';
-
-/**
- * Card component props
- */
-interface CardProps {
-  children: React.ReactNode;
-  hoverable?: boolean;
-  gradient?: boolean;
-  onClick?: () => void;
-  className?: string;
-}
-
 /**
  * Modern Card component with glass morphism and gradient effects
  *
@@ -20,26 +8,16 @@ interface CardProps {
  *   <p>Card content</p>
  * </Card>
  */
-export function Card({
-  children,
-  hoverable = false,
-  gradient = false,
-  onClick,
-  className = '',
-}: CardProps) {
-  const baseClasses = gradient
-    ? 'card-gradient'
-    : 'bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200/50 p-6';
-
-  const hoverClasses = hoverable
-    ? 'hover:shadow-2xl hover:-translate-y-1 hover:border-violet-300 transition-all duration-300 cursor-pointer hover-glow'
-    : 'transition-all duration-300';
-
-  const classes = `${baseClasses} ${hoverClasses} ${className}`;
-
-  return (
-    <div className={classes} onClick={onClick}>
+export function Card({ children, hoverable = false, gradient = false, onClick, className = '', }) {
+    const baseClasses = gradient
+        ? 'card-gradient'
+        : 'bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200/50 p-6';
+    const hoverClasses = hoverable
+        ? 'hover:shadow-2xl hover:-translate-y-1 hover:border-violet-300 transition-all duration-300 cursor-pointer hover-glow'
+        : 'transition-all duration-300';
+    const classes = `${baseClasses} ${hoverClasses} ${className}`;
+    return (<div className={classes} onClick={onClick}>
       {children}
-    </div>
-  );
+    </div>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQ2FyZC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIkNhcmQudHN4Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sS0FBSyxNQUFNLE9BQU8sQ0FBQztBQWExQjs7Ozs7Ozs7R0FRRztBQUNILE1BQU0sVUFBVSxJQUFJLENBQUMsRUFDbkIsUUFBUSxFQUNSLFNBQVMsR0FBRyxLQUFLLEVBQ2pCLFFBQVEsR0FBRyxLQUFLLEVBQ2hCLE9BQU8sRUFDUCxTQUFTLEdBQUcsRUFBRSxHQUNKO0lBQ1YsTUFBTSxXQUFXLEdBQUcsUUFBUTtRQUMxQixDQUFDLENBQUMsZUFBZTtRQUNqQixDQUFDLENBQUMsbUZBQW1GLENBQUM7SUFFeEYsTUFBTSxZQUFZLEdBQUcsU0FBUztRQUM1QixDQUFDLENBQUMscUhBQXFIO1FBQ3ZILENBQUMsQ0FBQyw2QkFBNkIsQ0FBQztJQUVsQyxNQUFNLE9BQU8sR0FBRyxHQUFHLFdBQVcsSUFBSSxZQUFZLElBQUksU0FBUyxFQUFFLENBQUM7SUFFOUQsT0FBTyxDQUNMLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxDQUFDLE9BQU8sQ0FBQyxDQUFDLE9BQU8sQ0FBQyxDQUFDLE9BQU8sQ0FBQyxDQUN4QztNQUFBLENBQUMsUUFBUSxDQUNYO0lBQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5cbi8qKlxuICogQ2FyZCBjb21wb25lbnQgcHJvcHNcbiAqL1xuaW50ZXJmYWNlIENhcmRQcm9wcyB7XG4gIGNoaWxkcmVuOiBSZWFjdC5SZWFjdE5vZGU7XG4gIGhvdmVyYWJsZT86IGJvb2xlYW47XG4gIGdyYWRpZW50PzogYm9vbGVhbjtcbiAgb25DbGljaz86ICgpID0+IHZvaWQ7XG4gIGNsYXNzTmFtZT86IHN0cmluZztcbn1cblxuLyoqXG4gKiBNb2Rlcm4gQ2FyZCBjb21wb25lbnQgd2l0aCBnbGFzcyBtb3JwaGlzbSBhbmQgZ3JhZGllbnQgZWZmZWN0c1xuICpcbiAqIEBleGFtcGxlXG4gKiA8Q2FyZCBob3ZlcmFibGUgZ3JhZGllbnQgb25DbGljaz17aGFuZGxlQ2xpY2t9PlxuICogICA8aDM+Q2FyZCBUaXRsZTwvaDM+XG4gKiAgIDxwPkNhcmQgY29udGVudDwvcD5cbiAqIDwvQ2FyZD5cbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIENhcmQoe1xuICBjaGlsZHJlbixcbiAgaG92ZXJhYmxlID0gZmFsc2UsXG4gIGdyYWRpZW50ID0gZmFsc2UsXG4gIG9uQ2xpY2ssXG4gIGNsYXNzTmFtZSA9ICcnLFxufTogQ2FyZFByb3BzKSB7XG4gIGNvbnN0IGJhc2VDbGFzc2VzID0gZ3JhZGllbnRcbiAgICA/ICdjYXJkLWdyYWRpZW50J1xuICAgIDogJ2JnLXdoaXRlLzkwIGJhY2tkcm9wLWJsdXItc20gcm91bmRlZC0yeGwgc2hhZG93LWxnIGJvcmRlciBib3JkZXItc2xhdGUtMjAwLzUwIHAtNic7XG5cbiAgY29uc3QgaG92ZXJDbGFzc2VzID0gaG92ZXJhYmxlXG4gICAgPyAnaG92ZXI6c2hhZG93LTJ4bCBob3ZlcjotdHJhbnNsYXRlLXktMSBob3Zlcjpib3JkZXItdmlvbGV0LTMwMCB0cmFuc2l0aW9uLWFsbCBkdXJhdGlvbi0zMDAgY3Vyc29yLXBvaW50ZXIgaG92ZXItZ2xvdydcbiAgICA6ICd0cmFuc2l0aW9uLWFsbCBkdXJhdGlvbi0zMDAnO1xuXG4gIGNvbnN0IGNsYXNzZXMgPSBgJHtiYXNlQ2xhc3Nlc30gJHtob3ZlckNsYXNzZXN9ICR7Y2xhc3NOYW1lfWA7XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT17Y2xhc3Nlc30gb25DbGljaz17b25DbGlja30+XG4gICAgICB7Y2hpbGRyZW59XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXX0=

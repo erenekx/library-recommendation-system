@@ -1,155 +1,137 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/common/Button';
-import { Modal } from '@/components/common/Modal';
-import { Input } from '@/components/common/Input';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { getReadingLists, createReadingList } from '@/services/api';
-import { ReadingList } from '@/types';
-import { formatDate } from '@/utils/formatters';
-import { handleApiError, showSuccess } from '@/utils/errorHandling';
-
+// src/pages/ReadingLists.tsx
+import { useEffect, useState } from "react";
+import { Button } from "@/components/common/Button";
+import { Modal } from "@/components/common/Modal";
+import { Input } from "@/components/common/Input";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { getReadingLists, createReadingList } from "@/services/api";
+import { formatDate } from "@/utils/formatters";
+import { handleApiError, showSuccess } from "@/utils/errorHandling";
 /**
  * ReadingLists page component
  */
 export function ReadingLists() {
-  const [lists, setLists] = useState<ReadingList[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newListName, setNewListName] = useState('');
-  const [newListDescription, setNewListDescription] = useState('');
-
-  useEffect(() => {
-    loadLists();
-  }, []);
-
-  const loadLists = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Replace with DynamoDB query
-      const data = await getReadingLists();
-      setLists(data);
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsLoading(false);
+    const [lists, setLists] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newListName, setNewListName] = useState("");
+    const [newListDescription, setNewListDescription] = useState("");
+    const loadLists = async () => {
+        setIsLoading(true);
+        try {
+            // TODO: Replace with DynamoDB query
+            const data = await getReadingLists();
+            setLists(data);
+        }
+        catch (error) {
+            handleApiError(error);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+    useEffect(() => {
+        void loadLists();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const handleCreateList = async () => {
+        if (!newListName.trim()) {
+            alert("Please enter a list name");
+            return;
+        }
+        try {
+            const now = new Date().toISOString();
+            // TODO: Replace with DynamoDB put operation
+            const created = await createReadingList({
+                userId: "1", // TODO: Get from auth context
+                name: newListName.trim(),
+                description: newListDescription.trim(),
+                bookIds: [],
+                createdAt: now,
+                updatedAt: now,
+            });
+            setLists((prev) => [...prev, created]);
+            setIsModalOpen(false);
+            setNewListName("");
+            setNewListDescription("");
+            showSuccess("Reading list created successfully!");
+        }
+        catch (error) {
+            handleApiError(error);
+        }
+    };
+    if (isLoading) {
+        return (<div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg"/>
+      </div>);
     }
-  };
-
-  const handleCreateList = async () => {
-    if (!newListName.trim()) {
-      alert('Please enter a list name');
-      return;
-    }
-
-    try {
-      // TODO: Replace with DynamoDB put operation
-      const newList = await createReadingList({
-        userId: '1', // TODO: Get from auth context
-        name: newListName,
-        description: newListDescription,
-        bookIds: [],
-      });
-      setLists([...lists, newList]);
-      setIsModalOpen(false);
-      setNewListName('');
-      setNewListDescription('');
-      showSuccess('Reading list created successfully!');
-    } catch (error) {
-      handleApiError(error);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen py-8 px-4">
+    return (<div className="min-h-screen py-8 px-4">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">My Reading Lists</h1>
-            <p className="text-slate-600 text-lg">Organize your books into custom lists</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">
+              My Reading Lists
+            </h1>
+            <p className="text-slate-600 text-lg">
+              Organize your books into custom lists
+            </p>
           </div>
+
           <Button variant="primary" size="lg" onClick={() => setIsModalOpen(true)}>
             Create New List
           </Button>
         </div>
 
-        {lists.length === 0 ? (
-          <div className="text-center py-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200">
-            <svg
-              className="w-16 h-16 text-slate-400 mx-auto mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
+        {lists.length === 0 ? (<div className="text-center py-12 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200">
+            <svg className="w-16 h-16 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No reading lists yet</h3>
+
+            <h3 className="text-xl font-bold text-slate-900 mb-2">
+              No reading lists yet
+            </h3>
+
             <p className="text-slate-600 mb-4">
               Create your first list to start organizing your books
             </p>
+
             <Button variant="primary" onClick={() => setIsModalOpen(true)}>
               Create Your First List
             </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {lists.map((list) => (
-              <div
-                key={list.id}
-                className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 cursor-pointer"
-              >
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{list.name}</h3>
-                <p className="text-slate-600 mb-4 line-clamp-2">{list.description}</p>
+          </div>) : (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {lists.map((list) => (<div key={list.id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 cursor-pointer">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  {list.name}
+                </h3>
+
+                <p className="text-slate-600 mb-4 line-clamp-2">
+                  {list.description}
+                </p>
+
                 <div className="flex items-center justify-between text-sm text-slate-500">
                   <span>{list.bookIds.length} books</span>
                   <span>Created {formatDate(list.createdAt)}</span>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              </div>))}
+          </div>)}
 
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Create New Reading List"
-        >
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Reading List">
           <div>
-            <Input
-              label="List Name"
-              type="text"
-              value={newListName}
-              onChange={(e) => setNewListName(e.target.value)}
-              placeholder="e.g., Summer Reading 2024"
-              required
-            />
+            <Input label="List Name" type="text" value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="e.g., Summer Reading 2024" required/>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-              <textarea
-                value={newListDescription}
-                onChange={(e) => setNewListDescription(e.target.value)}
-                placeholder="What's this list about?"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px] resize-none"
-              />
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Description
+              </label>
+
+              <textarea value={newListDescription} onChange={(e) => setNewListDescription(e.target.value)} placeholder="What's this list about?" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px] resize-none"/>
             </div>
 
             <div className="flex gap-3">
               <Button variant="primary" onClick={handleCreateList} className="flex-1">
                 Create List
               </Button>
+
               <Button variant="secondary" onClick={() => setIsModalOpen(false)} className="flex-1">
                 Cancel
               </Button>
@@ -157,6 +139,6 @@ export function ReadingLists() {
           </div>
         </Modal>
       </div>
-    </div>
-  );
+    </div>);
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUmVhZGluZ0xpc3RzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiUmVhZGluZ0xpc3RzLnRzeCJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSw2QkFBNkI7QUFDN0IsT0FBTyxFQUFFLFNBQVMsRUFBRSxRQUFRLEVBQUUsTUFBTSxPQUFPLENBQUM7QUFDNUMsT0FBTyxFQUFFLE1BQU0sRUFBRSxNQUFNLDRCQUE0QixDQUFDO0FBQ3BELE9BQU8sRUFBRSxLQUFLLEVBQUUsTUFBTSwyQkFBMkIsQ0FBQztBQUNsRCxPQUFPLEVBQUUsS0FBSyxFQUFFLE1BQU0sMkJBQTJCLENBQUM7QUFDbEQsT0FBTyxFQUFFLGNBQWMsRUFBRSxNQUFNLG9DQUFvQyxDQUFDO0FBQ3BFLE9BQU8sRUFBRSxlQUFlLEVBQUUsaUJBQWlCLEVBQUUsTUFBTSxnQkFBZ0IsQ0FBQztBQUVwRSxPQUFPLEVBQUUsVUFBVSxFQUFFLE1BQU0sb0JBQW9CLENBQUM7QUFDaEQsT0FBTyxFQUFFLGNBQWMsRUFBRSxXQUFXLEVBQUUsTUFBTSx1QkFBdUIsQ0FBQztBQUVwRTs7R0FFRztBQUNILE1BQU0sVUFBVSxZQUFZO0lBQzFCLE1BQU0sQ0FBQyxLQUFLLEVBQUUsUUFBUSxDQUFDLEdBQUcsUUFBUSxDQUFnQixFQUFFLENBQUMsQ0FBQztJQUN0RCxNQUFNLENBQUMsU0FBUyxFQUFFLFlBQVksQ0FBQyxHQUFHLFFBQVEsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUVqRCxNQUFNLENBQUMsV0FBVyxFQUFFLGNBQWMsQ0FBQyxHQUFHLFFBQVEsQ0FBQyxLQUFLLENBQUMsQ0FBQztJQUN0RCxNQUFNLENBQUMsV0FBVyxFQUFFLGNBQWMsQ0FBQyxHQUFHLFFBQVEsQ0FBQyxFQUFFLENBQUMsQ0FBQztJQUNuRCxNQUFNLENBQUMsa0JBQWtCLEVBQUUscUJBQXFCLENBQUMsR0FBRyxRQUFRLENBQUMsRUFBRSxDQUFDLENBQUM7SUFFakUsTUFBTSxTQUFTLEdBQUcsS0FBSyxJQUFJLEVBQUU7UUFD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QUUsQ0FBQyxxQkFBcUIsQ0FBQyxDQUFDLENBQUMsTUFBTSxDQUFDLEtBQUssQ0FBQyxDQUFDLENBQ3ZELFdBQVcsQ0FBQyx5QkFBeUIsQ0FDckMsU0FBUyxDQUFDLHFJQUFxSSxFQUVuSjtZQUFBLEVBQUUsR0FBRyxDQUVMOztZQUFBLENBQUMsR0FBRyxDQUFDLFNBQVMsQ0FBQyxZQUFZLENBQ3pCO2NBQUEsQ0FBQyxNQUFNLENBQUMsT0FBTyxDQUFDLFNBQVMsQ0FBQyxPQUFPLENBQUMsQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDLFNBQVMsQ0FBQyxRQUFRLENBQ3JFOztjQUNGLEVBQUUsTUFBTSxDQUVSOztjQUFBLENBQUMsTUFBTSxDQUNMLE9BQU8sQ0FBQyxXQUFXLENBQ25CLE9BQU8sQ0FBQyxDQUFDLEdBQUcsRUFBRSxDQUFDLGNBQWMsQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUNyQyxTQUFTLENBQUMsUUFBUSxDQUVsQjs7Y0FDRixFQUFFLE1BQU0sQ0FDVjtZQUFBLEVBQUUsR0FBRyxDQUNQO1VBQUEsRUFBRSxHQUFHLENBQ1A7UUFBQSxFQUFFLEtBQUssQ0FDVDtNQUFBLEVBQUUsR0FBRyxDQUNQO0lBQUEsRUFBRSxHQUFHLENBQUMsQ0FDUCxDQUFDO0FBQ0osQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8vIHNyYy9wYWdlcy9SZWFkaW5nTGlzdHMudHN4XG5pbXBvcnQgeyB1c2VFZmZlY3QsIHVzZVN0YXRlIH0gZnJvbSBcInJlYWN0XCI7XG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tIFwiQC9jb21wb25lbnRzL2NvbW1vbi9CdXR0b25cIjtcbmltcG9ydCB7IE1vZGFsIH0gZnJvbSBcIkAvY29tcG9uZW50cy9jb21tb24vTW9kYWxcIjtcbmltcG9ydCB7IElucHV0IH0gZnJvbSBcIkAvY29tcG9uZW50cy9jb21tb24vSW5wdXRcIjtcbmltcG9ydCB7IExvYWRpbmdTcGlubmVyIH0gZnJvbSBcIkAvY29tcG9uZW50cy9jb21tb24vTG9hZGluZ1NwaW5uZXJcIjtcbmltcG9ydCB7IGdldFJlYWRpbmdMaXN0cywgY3JlYXRlUmVhZGluZ0xpc3QgfSBmcm9tIFwiQC9zZXJ2aWNlcy9hcGlcIjtcbmltcG9ydCB0eXBlIHsgUmVhZGluZ0xpc3QgfSBmcm9tIFwiQC90eXBlc1wiO1xuaW1wb3J0IHsgZm9ybWF0RGF0ZSB9IGZyb20gXCJAL3V0aWxzL2Zvcm1hdHRlcnNcIjtcbmltcG9ydCB7IGhhbmRsZUFwaUVycm9yLCBzaG93U3VjY2VzcyB9IGZyb20gXCJAL3V0aWxzL2Vycm9ySGFuZGxpbmdcIjtcblxuLyoqXG4gKiBSZWFkaW5nTGlzdHMgcGFnZSBjb21wb25lbnRcbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIFJlYWRpbmdMaXN0cygpIHtcbiAgY29uc3QgW2xpc3RzLCBzZXRMaXN0c10gPSB1c2VTdGF0ZTxSZWFkaW5nTGlzdFtdPihbXSk7XG4gIGNvbnN0IFtpc0xvYWRpbmcsIHNldElzTG9hZGluZ10gPSB1c2VTdGF0ZSh0cnVlKTtcblxuICBjb25zdCBbaXNNb2RhbE9wZW4sIHNldElzTW9kYWxPcGVuXSA9IHVzZVN0YXRlKGZhbHNlKTtcbiAgY29uc3QgW25ld0xpc3ROYW1lLCBzZXROZXdMaXN0TmFtZV0gPSB1c2VTdGF0ZShcIlwiKTtcbiAgY29uc3QgW25ld0xpc3REZXNjcmlwdGlvbiwgc2V0TmV3TGlzdERlc2NyaXB0aW9uXSA9IHVzZVN0YXRlKFwiXCIpO1xuXG4gIGNvbnN0IGxvYWRMaXN0cyA9IGFzeW5jICgpID0+IHtcbiAgICBzZXRJc0xvYWRpbmcodHJ1ZSk7XG4gICAgdHJ5IHtcbiAgICAgIC8vIFRPRE86IFJlcGxhY2Ugd2l0aCBEeW5hbW9EQiBxdWVyeVxuICAgICAgY29uc3QgZGF0YSA9IGF3YWl0IGdldFJlYWRpbmdMaXN0cygpO1xuICAgICAgc2V0TGlzdHMoZGF0YSk7XG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcbiAgICAgIGhhbmRsZUFwaUVycm9yKGVycm9yKTtcbiAgICB9IGZpbmFsbHkge1xuICAgICAgc2V0SXNMb2FkaW5nKGZhbHNlKTtcbiAgICB9XG4gIH07XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICB2b2lkIGxvYWRMaXN0cygpO1xuICAgIC8vIGVzbGludC1kaXNhYmxlLW5leHQtbGluZSByZWFjdC1ob29rcy9leGhhdXN0aXZlLWRlcHNcbiAgfSwgW10pO1xuXG4gIGNvbnN0IGhhbmRsZUNyZWF0ZUxpc3QgPSBhc3luYyAoKSA9PiB7XG4gICAgaWYgKCFuZXdMaXN0TmFtZS50cmltKCkpIHtcbiAgICAgIGFsZXJ0KFwiUGxlYXNlIGVudGVyIGEgbGlzdCBuYW1lXCIpO1xuICAgICAgcmV0dXJuO1xuICAgIH1cblxuICAgIHRyeSB7XG4gICAgICBjb25zdCBub3cgPSBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCk7XG5cbiAgICAgIC8vIFRPRE86IFJlcGxhY2Ugd2l0aCBEeW5hbW9EQiBwdXQgb3BlcmF0aW9uXG4gICAgICBjb25zdCBjcmVhdGVkID0gYXdhaXQgY3JlYXRlUmVhZGluZ0xpc3Qoe1xuICAgICAgICB1c2VySWQ6IFwiMVwiLCAvLyBUT0RPOiBHZXQgZnJvbSBhdXRoIGNvbnRleHRcbiAgICAgICAgbmFtZTogbmV3TGlzdE5hbWUudHJpbSgpLFxuICAgICAgICBkZXNjcmlwdGlvbjogbmV3TGlzdERlc2NyaXB0aW9uLnRyaW0oKSxcbiAgICAgICAgYm9va0lkczogW10sXG4gICAgICAgIGNyZWF0ZWRBdDogbm93LFxuICAgICAgICB1cGRhdGVkQXQ6IG5vdyxcbiAgICAgIH0pO1xuXG4gICAgICBzZXRMaXN0cygocHJldikgPT4gWy4uLnByZXYsIGNyZWF0ZWRdKTtcblxuICAgICAgc2V0SXNNb2RhbE9wZW4oZmFsc2UpO1xuICAgICAgc2V0TmV3TGlzdE5hbWUoXCJcIik7XG4gICAgICBzZXROZXdMaXN0RGVzY3JpcHRpb24oXCJcIik7XG5cbiAgICAgIHNob3dTdWNjZXNzKFwiUmVhZGluZyBsaXN0IGNyZWF0ZWQgc3VjY2Vzc2Z1bGx5IVwiKTtcbiAgICB9IGNhdGNoIChlcnJvcikge1xuICAgICAgaGFuZGxlQXBpRXJyb3IoZXJyb3IpO1xuICAgIH1cbiAgfTtcblxuICBpZiAoaXNMb2FkaW5nKSB7XG4gICAgcmV0dXJuIChcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWluLWgtc2NyZWVuIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyXCI+XG4gICAgICAgIDxMb2FkaW5nU3Bpbm5lciBzaXplPVwibGdcIiAvPlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJtaW4taC1zY3JlZW4gcHktOCBweC00XCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbnRhaW5lciBteC1hdXRvXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW4gaXRlbXMtY2VudGVyIG1iLThcIj5cbiAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgPGgxIGNsYXNzTmFtZT1cInRleHQtNHhsIG1kOnRleHQtNXhsIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTkwMCBtYi0yXCI+XG4gICAgICAgICAgICAgIE15IFJlYWRpbmcgTGlzdHNcbiAgICAgICAgICAgIDwvaDE+XG4gICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTYwMCB0ZXh0LWxnXCI+XG4gICAgICAgICAgICAgIE9yZ2FuaXplIHlvdXIgYm9va3MgaW50byBjdXN0b20gbGlzdHNcbiAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cInByaW1hcnlcIiBzaXplPVwibGdcIiBvbkNsaWNrPXsoKSA9PiBzZXRJc01vZGFsT3Blbih0cnVlKX0+XG4gICAgICAgICAgICBDcmVhdGUgTmV3IExpc3RcbiAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAge2xpc3RzLmxlbmd0aCA9PT0gMCA/IChcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHB5LTEyIGJnLXdoaXRlLzkwIGJhY2tkcm9wLWJsdXItc20gcm91bmRlZC14bCBzaGFkb3ctbGcgYm9yZGVyIGJvcmRlci1zbGF0ZS0yMDBcIj5cbiAgICAgICAgICAgIDxzdmdcbiAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy0xNiBoLTE2IHRleHQtc2xhdGUtNDAwIG14LWF1dG8gbWItNFwiXG4gICAgICAgICAgICAgIGZpbGw9XCJub25lXCJcbiAgICAgICAgICAgICAgc3Ryb2tlPVwiY3VycmVudENvbG9yXCJcbiAgICAgICAgICAgICAgdmlld0JveD1cIjAgMCAyNCAyNFwiXG4gICAgICAgICAgICA+XG4gICAgICAgICAgICAgIDxwYXRoXG4gICAgICAgICAgICAgICAgc3Ryb2tlTGluZWNhcD1cInJvdW5kXCJcbiAgICAgICAgICAgICAgICBzdHJva2VMaW5lam9pbj1cInJvdW5kXCJcbiAgICAgICAgICAgICAgICBzdHJva2VXaWR0aD17Mn1cbiAgICAgICAgICAgICAgICBkPVwiTTkgNUg3YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMmgxMGEyIDIgMCAwMDItMlY3YTIgMiAwIDAwLTItMmgtMk05IDVhMiAyIDAgMDAyIDJoMmEyIDIgMCAwMDItMk05IDVhMiAyIDAgMDEyLTJoMmEyIDIgMCAwMTIgMlwiXG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L3N2Zz5cblxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cInRleHQteGwgZm9udC1ib2xkIHRleHQtc2xhdGUtOTAwIG1iLTJcIj5cbiAgICAgICAgICAgICAgTm8gcmVhZGluZyBsaXN0cyB5ZXRcbiAgICAgICAgICAgIDwvaDM+XG5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc2xhdGUtNjAwIG1iLTRcIj5cbiAgICAgICAgICAgICAgQ3JlYXRlIHlvdXIgZmlyc3QgbGlzdCB0byBzdGFydCBvcmdhbml6aW5nIHlvdXIgYm9va3NcbiAgICAgICAgICAgIDwvcD5cblxuICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwicHJpbWFyeVwiIG9uQ2xpY2s9eygpID0+IHNldElzTW9kYWxPcGVuKHRydWUpfT5cbiAgICAgICAgICAgICAgQ3JlYXRlIFlvdXIgRmlyc3QgTGlzdFxuICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICkgOiAoXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIG1kOmdyaWQtY29scy0yIGxnOmdyaWQtY29scy0zIGdhcC02XCI+XG4gICAgICAgICAgICB7bGlzdHMubWFwKChsaXN0KSA9PiAoXG4gICAgICAgICAgICAgIDxkaXZcbiAgICAgICAgICAgICAgICBrZXk9e2xpc3QuaWR9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiYmctd2hpdGUvOTAgYmFja2Ryb3AtYmx1ci1zbSByb3VuZGVkLXhsIHNoYWRvdy1zbSBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMCBwLTYgaG92ZXI6c2hhZG93LXhsIGhvdmVyOmJvcmRlci1ibHVlLTMwMCB0cmFuc2l0aW9uLWFsbCBkdXJhdGlvbi0zMDAgY3Vyc29yLXBvaW50ZXJcIlxuICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cInRleHQteGwgZm9udC1ib2xkIHRleHQtc2xhdGUtOTAwIG1iLTJcIj5cbiAgICAgICAgICAgICAgICAgIHtsaXN0Lm5hbWV9XG4gICAgICAgICAgICAgICAgPC9oMz5cblxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc2xhdGUtNjAwIG1iLTQgbGluZS1jbGFtcC0yXCI+XG4gICAgICAgICAgICAgICAgICB7bGlzdC5kZXNjcmlwdGlvbn1cbiAgICAgICAgICAgICAgICA8L3A+XG5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiB0ZXh0LXNtIHRleHQtc2xhdGUtNTAwXCI+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj57bGlzdC5ib29rSWRzLmxlbmd0aH0gYm9va3M8L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj5DcmVhdGVkIHtmb3JtYXREYXRlKGxpc3QuY3JlYXRlZEF0KX08L3NwYW4+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgKSl9XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICl9XG5cbiAgICAgICAgPE1vZGFsXG4gICAgICAgICAgaXNPcGVuPXtpc01vZGFsT3Blbn1cbiAgICAgICAgICBvbkNsb3NlPXsoKSA9PiBzZXRJc01vZGFsT3BlbihmYWxzZSl9XG4gICAgICAgICAgdGl0bGU9XCJDcmVhdGUgTmV3IFJlYWRpbmcgTGlzdFwiXG4gICAgICAgID5cbiAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgIGxhYmVsPVwiTGlzdCBOYW1lXCJcbiAgICAgICAgICAgICAgdHlwZT1cInRleHRcIlxuICAgICAgICAgICAgICB2YWx1ZT17bmV3TGlzdE5hbWV9XG4gICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0TmV3TGlzdE5hbWUoZS50YXJnZXQudmFsdWUpfVxuICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cImUuZy4sIFN1bW1lciBSZWFkaW5nIDIwMjRcIlxuICAgICAgICAgICAgICByZXF1aXJlZFxuICAgICAgICAgICAgLz5cblxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtYi00XCI+XG4gICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJibG9jayB0ZXh0LXNtIGZvbnQtbWVkaXVtIHRleHQtc2xhdGUtNzAwIG1iLTFcIj5cbiAgICAgICAgICAgICAgICBEZXNjcmlwdGlvblxuICAgICAgICAgICAgICA8L2xhYmVsPlxuXG4gICAgICAgICAgICAgIDx0ZXh0YXJlYVxuICAgICAgICAgICAgICAgIHZhbHVlPXtuZXdMaXN0RGVzY3JpcHRpb259XG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXROZXdMaXN0RGVzY3JpcHRpb24oZS50YXJnZXQudmFsdWUpfVxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiV2hhdCdzIHRoaXMgbGlzdCBhYm91dD9cIlxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbCBweC00IHB5LTIgYm9yZGVyIGJvcmRlci1ncmF5LTMwMCByb3VuZGVkLWxnIGZvY3VzOm91dGxpbmUtbm9uZSBmb2N1czpyaW5nLTIgZm9jdXM6cmluZy1wcmltYXJ5LTUwMCBtaW4taC1bMTAwcHhdIHJlc2l6ZS1ub25lXCJcbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZ2FwLTNcIj5cbiAgICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwicHJpbWFyeVwiIG9uQ2xpY2s9e2hhbmRsZUNyZWF0ZUxpc3R9IGNsYXNzTmFtZT1cImZsZXgtMVwiPlxuICAgICAgICAgICAgICAgIENyZWF0ZSBMaXN0XG4gICAgICAgICAgICAgIDwvQnV0dG9uPlxuXG4gICAgICAgICAgICAgIDxCdXR0b25cbiAgICAgICAgICAgICAgICB2YXJpYW50PVwic2Vjb25kYXJ5XCJcbiAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXRJc01vZGFsT3BlbihmYWxzZSl9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiZmxleC0xXCJcbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIENhbmNlbFxuICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L01vZGFsPlxuICAgICAgPC9kaXY+XG4gICAgPC9kaXY+XG4gICk7XG59Il19

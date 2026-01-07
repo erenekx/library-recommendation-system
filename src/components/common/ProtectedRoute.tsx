@@ -2,15 +2,6 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { LoadingSpinner } from './LoadingSpinner';
-
-/**
- * ProtectedRoute component props
- */
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requireAdmin?: boolean;
-}
-
 /**
  * ProtectedRoute component wraps routes that require authentication
  *
@@ -21,24 +12,19 @@ interface ProtectedRouteProps {
  *   </ProtectedRoute>
  * } />
  */
-export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, user } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (requireAdmin && user?.role !== 'admin') {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
+export function ProtectedRoute({ children, requireAdmin = false }) {
+    const { isAuthenticated, isLoading, user } = useAuth();
+    if (isLoading) {
+        return (<div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner size="lg"/>
+      </div>);
+    }
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace/>;
+    }
+    if (requireAdmin && user?.role !== 'admin') {
+        return <Navigate to="/" replace/>;
+    }
+    return <>{children}</>;
 }
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUHJvdGVjdGVkUm91dGUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJQcm90ZWN0ZWRSb3V0ZS50c3giXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxLQUFLLE1BQU0sT0FBTyxDQUFDO0FBQzFCLE9BQU8sRUFBRSxRQUFRLEVBQUUsTUFBTSxrQkFBa0IsQ0FBQztBQUM1QyxPQUFPLEVBQUUsT0FBTyxFQUFFLE1BQU0saUJBQWlCLENBQUM7QUFDMUMsT0FBTyxFQUFFLGNBQWMsRUFBRSxNQUFNLGtCQUFrQixDQUFDO0FBVWxEOzs7Ozs7Ozs7R0FTRztBQUNILE1BQU0sVUFBVSxjQUFjLENBQUMsRUFBRSxRQUFRLEVBQUUsWUFBWSxHQUFHLEtBQUssRUFBdUI7SUFDcEYsTUFBTSxFQUFFLGVBQWUsRUFBRSxTQUFTLEVBQUUsSUFBSSxFQUFFLEdBQUcsT0FBTyxFQUFFLENBQUM7SUFFdkQsSUFBSSxTQUFTLEVBQUUsQ0FBQztRQUNkLE9BQU8sQ0FDTCxDQUFDLEdBQUcsQ0FBQyxTQUFTLENBQUMsK0NBQStDLENBQzVEO1FBQUEsQ0FBQyxjQUFjLENBQUMsSUFBSSxDQUFDLElBQUksRUFDM0I7TUFBQSxFQUFFLEdBQUcsQ0FBQyxDQUNQLENBQUM7SUFDSixDQUFDO0lBRUQsSUFBSSxDQUFDLGVBQWUsRUFBRSxDQUFDO1FBQ3JCLE9BQU8sQ0FBQyxRQUFRLENBQUMsRUFBRSxDQUFDLFFBQVEsQ0FBQyxPQUFPLEVBQUcsQ0FBQztJQUMxQyxDQUFDO0lBRUQsSUFBSSxZQUFZLElBQUksSUFBSSxFQUFFLElBQUksS0FBSyxPQUFPLEVBQUUsQ0FBQztRQUMzQyxPQUFPLENBQUMsUUFBUSxDQUFDLEVBQUUsQ0FBQyxHQUFHLENBQUMsT0FBTyxFQUFHLENBQUM7SUFDckMsQ0FBQztJQUVELE9BQU8sRUFBRSxDQUFDLFFBQVEsQ0FBQyxHQUFHLENBQUM7QUFDekIsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBOYXZpZ2F0ZSB9IGZyb20gJ3JlYWN0LXJvdXRlci1kb20nO1xuaW1wb3J0IHsgdXNlQXV0aCB9IGZyb20gJ0AvaG9va3MvdXNlQXV0aCc7XG5pbXBvcnQgeyBMb2FkaW5nU3Bpbm5lciB9IGZyb20gJy4vTG9hZGluZ1NwaW5uZXInO1xuXG4vKipcbiAqIFByb3RlY3RlZFJvdXRlIGNvbXBvbmVudCBwcm9wc1xuICovXG5pbnRlcmZhY2UgUHJvdGVjdGVkUm91dGVQcm9wcyB7XG4gIGNoaWxkcmVuOiBSZWFjdC5SZWFjdE5vZGU7XG4gIHJlcXVpcmVBZG1pbj86IGJvb2xlYW47XG59XG5cbi8qKlxuICogUHJvdGVjdGVkUm91dGUgY29tcG9uZW50IHdyYXBzIHJvdXRlcyB0aGF0IHJlcXVpcmUgYXV0aGVudGljYXRpb25cbiAqXG4gKiBAZXhhbXBsZVxuICogPFJvdXRlIHBhdGg9XCIvYWRtaW5cIiBlbGVtZW50PXtcbiAqICAgPFByb3RlY3RlZFJvdXRlIHJlcXVpcmVBZG1pbj5cbiAqICAgICA8QWRtaW5QYWdlIC8+XG4gKiAgIDwvUHJvdGVjdGVkUm91dGU+XG4gKiB9IC8+XG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBQcm90ZWN0ZWRSb3V0ZSh7IGNoaWxkcmVuLCByZXF1aXJlQWRtaW4gPSBmYWxzZSB9OiBQcm90ZWN0ZWRSb3V0ZVByb3BzKSB7XG4gIGNvbnN0IHsgaXNBdXRoZW50aWNhdGVkLCBpc0xvYWRpbmcsIHVzZXIgfSA9IHVzZUF1dGgoKTtcblxuICBpZiAoaXNMb2FkaW5nKSB7XG4gICAgcmV0dXJuIChcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWNlbnRlciBpdGVtcy1jZW50ZXIgbWluLWgtc2NyZWVuXCI+XG4gICAgICAgIDxMb2FkaW5nU3Bpbm5lciBzaXplPVwibGdcIiAvPlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIGlmICghaXNBdXRoZW50aWNhdGVkKSB7XG4gICAgcmV0dXJuIDxOYXZpZ2F0ZSB0bz1cIi9sb2dpblwiIHJlcGxhY2UgLz47XG4gIH1cblxuICBpZiAocmVxdWlyZUFkbWluICYmIHVzZXI/LnJvbGUgIT09ICdhZG1pbicpIHtcbiAgICByZXR1cm4gPE5hdmlnYXRlIHRvPVwiL1wiIHJlcGxhY2UgLz47XG4gIH1cblxuICByZXR1cm4gPD57Y2hpbGRyZW59PC8+O1xufVxuIl19
