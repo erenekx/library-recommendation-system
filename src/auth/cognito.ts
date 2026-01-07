@@ -1,6 +1,5 @@
 export const cognitoConfig = {
-    region: "eu-north-1",
-    userPoolId: "eu-north-1_MEmabyLZw",
-    userPoolWebClientId: "29q2l8kspvifb1b3gp4muv88rh",
+  region: "eu-north-1",
+  userPoolId: "eu-north-1_MEmabyLZw",
+  userPoolWebClientId: "44ve71u8ukka5ms9ri1shj2d6",
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29nbml0by5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImNvZ25pdG8udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsTUFBTSxDQUFDLE1BQU0sYUFBYSxHQUFHO0lBQzNCLE1BQU0sRUFBRSxZQUFZO0lBQ3BCLFVBQVUsRUFBRSxzQkFBc0I7SUFDbEMsbUJBQW1CLEVBQUUsNEJBQTRCO0NBQ2xELENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgY29uc3QgY29nbml0b0NvbmZpZyA9IHtcbiAgcmVnaW9uOiBcImV1LW5vcnRoLTFcIixcbiAgdXNlclBvb2xJZDogXCJldS1ub3J0aC0xX01FbWFieUxad1wiLFxuICB1c2VyUG9vbFdlYkNsaWVudElkOiBcIjI5cTJsOGtzcHZpZmIxYjNncDRtdXY4OHJoXCIsXG59OyJdfQ==

@@ -1,12 +1,5 @@
-import { Amplify } from "aws-amplify";
-import { cognitoConfig } from "./auth/cognito";
-
-Amplify.configure({
-  Auth: {
-    Cognito: {
-      userPoolId: cognitoConfig.userPoolId,
-      userPoolClientId: cognitoConfig.userPoolClientId,
-      region: cognitoConfig.region,
-    },
-  },
-});
+export const cognitoConfig = {
+  region: "eu-north-1",
+  userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
+  userPoolWebClientId: import.meta.env.VITE_COGNITO_USER_POOL_CLIENT_ID,
+};
